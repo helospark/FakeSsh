@@ -48,9 +48,6 @@ public class DhGexReply {
 		byteStream.write(packetType.getValue());
 		byteStream.write(publicKey.serialize());
 		byteStream.write(f.serialize());
-		//		byteStream.write(new byte[1]);
-		//		byteStream.write(new byte[] { 0, 0, 0x00, -0x6C });
-		//		hash = new SshString("heyh");
 		byteStream.write(hash.serialize());
 		return byteStream.toByteArray();
 	}

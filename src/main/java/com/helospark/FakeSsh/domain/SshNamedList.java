@@ -5,16 +5,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class AlgorithmNegotiationNameList {
-	private static final int SIZE_OF_INTEGER = 4;
+public class SshNamedList {
 	private static final String LIST_SEPARATOR = ",";
 	private List<String> elements;
 
-	public AlgorithmNegotiationNameList(List<String> elements) {
+	public SshNamedList(List<String> elements) {
 		this.elements = elements;
 	}
 
-	public AlgorithmNegotiationNameList(String elements) {
+	public SshNamedList(String elements) {
 		this.elements = Arrays.asList(elements.split(LIST_SEPARATOR));
 	}
 

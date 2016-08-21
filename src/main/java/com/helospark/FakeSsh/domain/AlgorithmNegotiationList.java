@@ -7,24 +7,31 @@ import java.nio.ByteBuffer;
 
 import com.helospark.FakeSsh.ByteConverterUtils;
 import com.helospark.FakeSsh.PacketType;
-import com.helospark.FakeSsh.SshStringReader;
 
 public class AlgorithmNegotiationList {
 	private static final int COOKIE_SIZE = 16;
 	public PacketType type;
 	public byte[] cookie;
-	public AlgorithmNegotiationNameList kexAlgorithms;
-	public AlgorithmNegotiationNameList serverHostKeyAlgorithms;
-	public AlgorithmNegotiationNameList encryptionAlgorithmsClientToServer;
-	public AlgorithmNegotiationNameList encryptionAlgorithmsServerToClient;
-	public AlgorithmNegotiationNameList macAlgorithmsClientToServer;
-	public AlgorithmNegotiationNameList macAlgorithmsServerToClient;
-	public AlgorithmNegotiationNameList compressionAlgorithmsClientToServer;
-	public AlgorithmNegotiationNameList compressionAlgorithmsServerToClient;
-	public AlgorithmNegotiationNameList languagesClientToServer;
-	public AlgorithmNegotiationNameList languagesServerToClient;
+	public SshNamedList kexAlgorithms;
+	public SshNamedList serverHostKeyAlgorithms;
+	public SshNamedList encryptionAlgorithmsClientToServer;
+	public SshNamedList encryptionAlgorithmsServerToClient;
+	public SshNamedList macAlgorithmsClientToServer;
+	public SshNamedList macAlgorithmsServerToClient;
+	public SshNamedList compressionAlgorithmsClientToServer;
+	public SshNamedList compressionAlgorithmsServerToClient;
+	public SshNamedList languagesClientToServer;
+	public SshNamedList languagesServerToClient;
 	public byte firstKeyPacketFollow;
 	public int reserved;
+
+	public AlgorithmNegotiationList() {
+
+	}
+
+	public AlgorithmNegotiationList(byte[] kexMessage) throws IOException {
+		deserialize(kexMessage);
+	}
 
 	public void deserialize(byte[] data) throws IOException {
 		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);
@@ -32,42 +39,26 @@ public class AlgorithmNegotiationList {
 		type = PacketType.fromValue(typeAsByte);
 		cookie = new byte[COOKIE_SIZE];
 		byteArrayInputStream.read(cookie);
-		String tmp;
-		tmp = SshStringReader.readString(byteArrayInputStream);
-		kexAlgorithms = new AlgorithmNegotiationNameList(tmp);
-
-		tmp = SshStringReader.readString(byteArrayInputStream);
-		serverHostKeyAlgorithms = new AlgorithmNegotiationNameList(tmp);
-
-		tmp = SshStringReader.readString(byteArrayInputStream);
-		encryptionAlgorithmsClientToServer = new AlgorithmNegotiationNameList(tmp);
-
-		tmp = SshStringReader.readString(byteArrayInputStream);
-		encryptionAlgorithmsServerToClient = new AlgorithmNegotiationNameList(tmp);
-
-		tmp = SshStringReader.readString(byteArrayInputStream);
-		macAlgorithmsClientToServer = new AlgorithmNegotiationNameList(tmp);
-
-		tmp = SshStringReader.readString(byteArrayInputStream);
-		macAlgorithmsServerToClient = new AlgorithmNegotiationNameList(tmp);
-
-		tmp = SshStringReader.readString(byteArrayInputStream);
-		compressionAlgorithmsClientToServer = new AlgorithmNegotiationNameList(tmp);
-
-		tmp = SshStringReader.readString(byteArrayInputStream);
-		compressionAlgorithmsServerToClient = new AlgorithmNegotiationNameList(tmp);
-
-		tmp = SshStringReader.readString(byteArrayInputStream);
-		languagesClientToServer = new AlgorithmNegotiationNameList(tmp);
-
-		tmp = SshStringReader.readString(byteArrayInputStream);
-		languagesServerToClient = new AlgorithmNegotiationNameList(tmp);
+		kexAlgorithms = readNamedListFromStream(byteArrayInputStream);
+		serverHostKeyAlgorithms = readNamedListFromStream(byteArrayInputStream);
+		encryptionAlgorithmsClientToServer = readNamedListFromStream(byteArrayInputStream);
+		encryptionAlgorithmsServerToClient = readNamedListFromStream(byteArrayInputStream);
+		macAlgorithmsClientToServer = readNamedListFromStream(byteArrayInputStream);
+		macAlgorithmsServerToClient = readNamedListFromStream(byteArrayInputStream);
+		compressionAlgorithmsClientToServer = readNamedListFromStream(byteArrayInputStream);
+		compressionAlgorithmsServerToClient = readNamedListFromStream(byteArrayInputStream);
+		languagesClientToServer = readNamedListFromStream(byteArrayInputStream);
+		languagesServerToClient = readNamedListFromStream(byteArrayInputStream);
 
 		firstKeyPacketFollow = (byte) byteArrayInputStream.read();
 
 		byte[] reservedAsByte = new byte[4];
 		byteArrayInputStream.read(reservedAsByte);
-		reserved = ByteConverterUtils.byteToInt(reservedAsByte);
+		reserved = ByteConverterUtils.byteArrayToInt(reservedAsByte);
+	}
+
+	private SshNamedList readNamedListFromStream(ByteArrayInputStream byteArrayInputStream) throws IOException {
+		return new SshNamedList(new SshString(byteArrayInputStream).getAsUtf8String());
 	}
 
 	public byte[] serialize() throws IOException {

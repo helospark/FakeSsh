@@ -2,10 +2,15 @@ package com.helospark.FakeSsh;
 
 import java.security.MessageDigest;
 
-public class MessageDigestBackedSshHashed implements SshHash {
+/**
+ * Hash function that uses MessageDigest as the implementation for the hash function.
+ * @author helospark
+ *
+ */
+public class MessageDigestBackedSshHash implements SshHash {
 	private MessageDigest messageDigest;
 
-	public MessageDigestBackedSshHashed(MessageDigest messageDigest) {
+	public MessageDigestBackedSshHash(MessageDigest messageDigest) {
 		this.messageDigest = messageDigest;
 	}
 

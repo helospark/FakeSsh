@@ -6,9 +6,23 @@ import java.io.UnsupportedEncodingException;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Service to generate the keys using based on RFC4253.
+ * The following method is used: HASH(K || H || identifier || session_id)
+ * If the hash is not long enough it will be extended by concatenating additional
+ * hashes.
+ * @author helospark
+ */
 @Component
 public class DiffieHellmanHashService {
 
+	/**
+	 * Generate the hash.
+	 * @param connection to get the Key, hash, hanhFunction and session_id from.
+	 * @param identifier the character concatenated
+	 * @param hashSize minimum number of bytes to generate
+	 * @return hashSize long generated hash
+	 */
 	public byte[] hash(SshConnection connection, char identifier, int hashSize) throws IOException {
 		byte[] hash = initialHash(connection, identifier);
 
@@ -45,11 +59,6 @@ public class DiffieHellmanHashService {
 		byteStream.write((byte) identifier);
 		byteStream.write(connection.getSessionId());
 		byte[] byteArray = byteStream.toByteArray();
-		System.out.printf("[[[[[[[[[[[[[[[[[[[[[%c]]]]]]]]]]]]]]]]]]]]]", identifier);
-		for (int i = 0; i < byteArray.length; ++i) {
-			System.out.printf("%02x", byteArray[i]);
-		}
-		System.out.println();
 		SshHash sshHash = connection.getHashFunction();
 		return sshHash.hash(byteArray);
 	}

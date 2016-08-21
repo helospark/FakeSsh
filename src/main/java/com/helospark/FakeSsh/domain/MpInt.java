@@ -8,7 +8,6 @@ import java.math.BigInteger;
 import com.helospark.FakeSsh.ByteConverterUtils;
 
 public class MpInt {
-	private static final int INTEGER_SIZE = 4;
 	private BigInteger integer;
 
 	public MpInt(byte[] data) {
@@ -29,7 +28,7 @@ public class MpInt {
 		}
 		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
 		byte[] integerBytes = integer.toByteArray();
-		byteStream.write(ByteConverterUtils.intToByte(integerBytes.length));
+		byteStream.write(ByteConverterUtils.intToByteArray(integerBytes.length));
 		byteStream.write(integerBytes);
 		return byteStream.toByteArray();
 	}
@@ -37,7 +36,7 @@ public class MpInt {
 	private void deserialize(ByteArrayInputStream byteStream) throws IOException {
 		byte[] sizeBytes = new byte[4];
 		byteStream.read(sizeBytes);
-		int size = ByteConverterUtils.byteToInt(sizeBytes);
+		int size = ByteConverterUtils.byteArrayToInt(sizeBytes);
 		byte[] data = new byte[size];
 		byteStream.read(data);
 		integer = new BigInteger(data);

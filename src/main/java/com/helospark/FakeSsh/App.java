@@ -6,8 +6,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
- * Hello world!
- *
+ * Entry point for the FakeSSH application.
+ * @author helospark
  */
 public class App {
 	private static ApplicationContext context;

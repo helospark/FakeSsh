@@ -1,71 +1,71 @@
 package com.helospark.FakeSsh;
 
-import java.util.Arrays;
-import java.util.Collections;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import com.helospark.FakeSsh.domain.AlgorithmNegotiationList;
-import com.helospark.FakeSsh.domain.AlgorithmNegotiationNameList;
 import com.helospark.FakeSsh.domain.NegotiatedAlgorithmList;
 import com.helospark.FakeSsh.domain.SshString;
 
-@Component
-public class SshSupportedAlgorithmExchange {
+/**
+ * Ssh state that exchange supported algorithms with the client.
+ * @author helospark
+ */
+@Component(StateNames.SUPPORTED_ALGORITHM_EXCHANGE_STATE)
+public class SshSupportedAlgorithmExchange implements SshState {
 	private SshDataExchangeService dataExchangeService;
-	private RandomNumberGenerator randomNumberGenerator;
+	private OurSupportedAlgorithmNegotiationListFactory ourSupportedAlgorithmNegotiationListFactory;
 	private NegotitatedAlgorithmExtractor negotitatedAlgorithmExtractor;
 	private SshHashFactory sshHashFactory;
-	private DiffieHellmanExchange next;
+	private SshState next;
 
 	@Autowired
-	public SshSupportedAlgorithmExchange(SshDataExchangeService dataExchangeService, RandomNumberGenerator randomNumberGenerator,
-			DiffieHellmanExchange diffieHellmanExchange, NegotitatedAlgorithmExtractor negotitatedAlgorithmExtractor,
+	public SshSupportedAlgorithmExchange(SshDataExchangeService dataExchangeService, OurSupportedAlgorithmNegotiationListFactory ourSupportedAlgorithmNegotiationListFactory,
+			@Qualifier(StateNames.DIFFIE_HELLMAN_EXHCANGE_STATE) SshState diffieHellmanExchange, NegotitatedAlgorithmExtractor negotitatedAlgorithmExtractor,
 			SshHashFactory sshHashFactory) {
 		this.dataExchangeService = dataExchangeService;
-		this.randomNumberGenerator = randomNumberGenerator;
+		this.ourSupportedAlgorithmNegotiationListFactory = ourSupportedAlgorithmNegotiationListFactory;
 		this.next = diffieHellmanExchange;
 		this.negotitatedAlgorithmExtractor = negotitatedAlgorithmExtractor;
 		this.sshHashFactory = sshHashFactory;
 	}
 
-	public void negotiateAlgorithm(SshConnection connection) {
+	@Override
+	public void enterState(SshConnection connection) {
 		try {
-			AlgorithmNegotiationList algorithmNegotiationList = createAlgorithmNegotiationList();
-			byte[] localeKexMessage = algorithmNegotiationList.serialize();
-			dataExchangeService.sendPacket(connection, localeKexMessage);
-			byte[] remoteKexMessage = dataExchangeService.readPacket(connection);
-			connection.setLocaleKexMessage(new SshString(localeKexMessage));
-			connection.setRemoteKexMessage(new SshString(remoteKexMessage));
-			AlgorithmNegotiationList remoteAlgorithmNegotiationList = new AlgorithmNegotiationList();
-			remoteAlgorithmNegotiationList.deserialize(remoteKexMessage);
-			NegotiatedAlgorithmList negotiatedAlgoritms = negotitatedAlgorithmExtractor.extract(algorithmNegotiationList, remoteAlgorithmNegotiationList);
-			connection.setNegotiatedAlgorithms(negotiatedAlgoritms);
-			connection.setHashFunction(sshHashFactory.createForKeyExchangeMethod(negotiatedAlgoritms.getKexAlgorithm()));
-			next.process(connection);
+			AlgorithmNegotiationList algorithmNegotiationList = ourSupportedAlgorithmNegotiationListFactory.createAlgorithmNegotiationList();
+			sendOurSupportedAlgorithmList(connection, algorithmNegotiationList);
+			AlgorithmNegotiationList remoteAlgorithmNegotiationList = readRemoteSupportedAlgorithmList(connection);
+			populateConnectionWithNegotiatedAlgorithms(connection, algorithmNegotiationList, remoteAlgorithmNegotiationList);
+			next.enterState(connection);
+		} catch (ConnectionClosedException e) {
+			return;
 		} catch (Exception e) {
-			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 	}
 
-	private AlgorithmNegotiationList createAlgorithmNegotiationList() {
-		AlgorithmNegotiationList algorithmNegotiationList = new AlgorithmNegotiationList();
-		algorithmNegotiationList.type = PacketType.SSH_MSG_KEXINIT;
-		algorithmNegotiationList.cookie = randomNumberGenerator.generateRandomBytes(16);
-		algorithmNegotiationList.reserved = 0;
-		algorithmNegotiationList.firstKeyPacketFollow = (byte) 0;
-		algorithmNegotiationList.kexAlgorithms = new AlgorithmNegotiationNameList(Collections.singletonList("diffie-hellman-group-exchange-sha1"));
-		algorithmNegotiationList.serverHostKeyAlgorithms = new AlgorithmNegotiationNameList(Collections.singletonList("ssh-dss"));
-		algorithmNegotiationList.encryptionAlgorithmsClientToServer = new AlgorithmNegotiationNameList(Arrays.asList("aes128-ctr"));
-		algorithmNegotiationList.encryptionAlgorithmsServerToClient = new AlgorithmNegotiationNameList(Arrays.asList("aes128-ctr"));
-		algorithmNegotiationList.macAlgorithmsClientToServer = new AlgorithmNegotiationNameList(Collections.singletonList("hmac-sha1"));
-		algorithmNegotiationList.macAlgorithmsServerToClient = new AlgorithmNegotiationNameList(Collections.singletonList("hmac-sha1"));
-		algorithmNegotiationList.compressionAlgorithmsClientToServer = new AlgorithmNegotiationNameList(Arrays.asList("none"));
-		algorithmNegotiationList.compressionAlgorithmsServerToClient = new AlgorithmNegotiationNameList(Arrays.asList("none"));
-		algorithmNegotiationList.languagesClientToServer = new AlgorithmNegotiationNameList(Collections.<String> emptyList());
-		algorithmNegotiationList.languagesServerToClient = new AlgorithmNegotiationNameList(Collections.<String> emptyList());
-		return algorithmNegotiationList;
+	private void sendOurSupportedAlgorithmList(SshConnection connection, AlgorithmNegotiationList algorithmNegotiationList) throws IOException {
+		byte[] localeKexMessage = algorithmNegotiationList.serialize();
+		connection.setLocaleKexMessage(new SshString(localeKexMessage));
+		dataExchangeService.sendPacket(connection, localeKexMessage);
 	}
+
+	private AlgorithmNegotiationList readRemoteSupportedAlgorithmList(SshConnection connection) throws IOException {
+		byte[] remoteKexMessage = dataExchangeService.readPacket(connection);
+		connection.setRemoteKexMessage(new SshString(remoteKexMessage));
+		AlgorithmNegotiationList remoteAlgorithmNegotiationList = new AlgorithmNegotiationList(remoteKexMessage);
+		return remoteAlgorithmNegotiationList;
+	}
+
+	private void populateConnectionWithNegotiatedAlgorithms(SshConnection connection, AlgorithmNegotiationList localeAlgorithmNegotiationList, AlgorithmNegotiationList remoteAlgorithmNegotiationList) throws NoSuchAlgorithmException {
+		NegotiatedAlgorithmList negotiatedAlgoritms = negotitatedAlgorithmExtractor.extract(localeAlgorithmNegotiationList, remoteAlgorithmNegotiationList);
+		connection.setNegotiatedAlgorithms(negotiatedAlgoritms);
+		connection.setHashFunction(sshHashFactory.createForKeyExchangeMethod(negotiatedAlgoritms.getKexAlgorithm()));
+	}
+
 }

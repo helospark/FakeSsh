@@ -11,6 +11,10 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
+/**
+ * Builds {@link BufferedReader} from a file or filename.
+ * @author helospark
+ */
 @Component
 public class BufferedReaderFactory {
 

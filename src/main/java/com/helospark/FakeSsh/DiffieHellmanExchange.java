@@ -7,6 +7,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import com.helospark.FakeSsh.domain.DhGexInit;
@@ -18,40 +19,46 @@ import com.helospark.FakeSsh.domain.MpInt;
 import com.helospark.FakeSsh.domain.NegotiatedAlgorithmList;
 import com.helospark.FakeSsh.domain.SshString;
 
-@Component
-public class DiffieHellmanExchange {
+@Component(StateNames.DIFFIE_HELLMAN_EXHCANGE_STATE)
+public class DiffieHellmanExchange implements SshState {
 	private SshDataExchangeService dataExchangeService;
 	private SafePrimeProvider safePrimeProvider;
 	private HashFunction hashFunction;
-	private PublicKeyProvider publicKeyProvider;
 	private DssSignatureService dssSignatureService;
 	private DiffieHellmanHashService diffieHellmanHashService;
 	private SshCipherFactory sshCipherFactory;
 	private SshMacFactory sshMacFactory;
 	private SshServiceRequestService next;
+	private LoggerSupport loggerSupport;
+	private DsaKeyProvider dsaKeyProvider;
 
 	@Autowired
 	public DiffieHellmanExchange(SshDataExchangeService dataExchangeService, SafePrimeProvider safePrimeProvider,
-			HashFunction hashFunction, PublicKeyProvider publicKeyProvider, DssSignatureService dssSignatureService, DiffieHellmanHashService diffieHellmanHashService,
-			SshCipherFactory sshCipherFactory, SshMacFactory sshMacFactory, SshServiceRequestService next) {
+			HashFunction hashFunction, DssSignatureService dssSignatureService, DiffieHellmanHashService diffieHellmanHashService,
+			SshCipherFactory sshCipherFactory, SshMacFactory sshMacFactory, @Qualifier(StateNames.SERVICE_REQUEST_STATE) SshServiceRequestService next,
+			LoggerSupport loggerSupport, DsaKeyProvider dsaKeyProvider) {
 		this.dataExchangeService = dataExchangeService;
 		this.safePrimeProvider = safePrimeProvider;
 		this.hashFunction = hashFunction;
-		this.publicKeyProvider = publicKeyProvider;
 		this.dssSignatureService = dssSignatureService;
 		this.diffieHellmanHashService = diffieHellmanHashService;
 		this.sshCipherFactory = sshCipherFactory;
 		this.sshMacFactory = sshMacFactory;
 		this.next = next;
+		this.loggerSupport = loggerSupport;
+		this.dsaKeyProvider = dsaKeyProvider;
 	}
 
-	public void process(SshConnection connection) {
+	@Override
+	public void enterState(SshConnection connection) {
 		try {
 			DhKeySize dhKeySize = readDhKeySize(connection);
 			GeneratedPrime prime = safePrimeProvider.providePrime(dhKeySize.getMinimumLength(), dhKeySize.getPreferredLength(), dhKeySize.getMaximumLength());
 			DhGexResponse dhGexResponse = createDhGexResponse(prime);
 			sendSafePrime(connection, dhGexResponse);
 			DhGexInit dhGexInit = readDhGexInit(connection);
+
+			loggerSupport.dumpBigIntegerInHex(dhGexInit.getE().getBigInteger(), "E");
 
 			BigInteger y = new BigInteger(prime.getBitLength() - 1, new SecureRandom());
 			MpInt f = new MpInt(prime.getGenerator().modPow(y, prime.getPrime()));
@@ -62,7 +69,7 @@ public class DiffieHellmanExchange {
 
 			DhGexReply dhGexReply = new DhGexReply();
 			dhGexReply.setPacketType(PacketType.SSH_MSG_KEX_DH_GEX_REPLY);
-			dhGexReply.setPublicKey(dssSignatureService.providePublicKey());
+			dhGexReply.setPublicKey(dsaKeyProvider.providePublicKey());
 			dhGexReply.setF(f);
 
 			dhGexReply.setHash(signHash(correctedHash));
@@ -70,8 +77,8 @@ public class DiffieHellmanExchange {
 			connection.setKey(k);
 			connection.setHash(hash);
 
-			dumpBigInteger(k.getBigInteger().toByteArray(), "shared key");
-			dumpBigInteger(publicKeyProvider.provide().serialize(), "Public key");
+			loggerSupport.dumpBigIntegerInHex(k.getBigInteger(), "K");
+			loggerSupport.dumpBigIntegerInHex(f.getBigInteger(), "Shared key");
 
 			dataExchangeService.sendPacket(connection, dhGexReply.serialize());
 
@@ -83,19 +90,13 @@ public class DiffieHellmanExchange {
 			dataExchangeService.sendPacket(connection, new byte[] { PacketType.SSH_MSG_NEWKEYS.getValue() });
 
 			calculateKeys(connection);
-			next.handleServiceRequest(connection);
+			next.enterState(connection);
+		} catch (ConnectionClosedException e) {
+			return;
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
-	}
-
-	private void dumpBigInteger(byte[] data, String name) {
-		System.out.println(name);
-		for (int i = 0; i < data.length; ++i) {
-			System.out.printf("%02X", data[i]);
-		}
-		System.out.println();
 	}
 
 	private void calculateKeys(SshConnection connection) throws IOException, NoSuchAlgorithmException {
@@ -112,25 +113,17 @@ public class DiffieHellmanExchange {
 		SshMac clientToServerMac = sshMacFactory.createMac(negotiatedAlgorithms.getMacAlgorithmsClientToServer(), integrityKeyClientToServer);
 		SshMac serverToClientMac = sshMacFactory.createMac(negotiatedAlgorithms.getMacAlgorithmsServerToClient(), integrityKeyServerToClient);
 
-		dumpByteArray(ivClientToServer, "A");
-		dumpByteArray(ivServerToClient, "B");
-		dumpByteArray(keyClientToServer, "C");
-		dumpByteArray(keyServerToClient, "D");
-		dumpByteArray(integrityKeyClientToServer, "E");
-		dumpByteArray(integrityKeyServerToClient, "F");
+		loggerSupport.dumpByteArrayInHex(ivClientToServer, "Hash 'A'");
+		loggerSupport.dumpByteArrayInHex(ivServerToClient, "Hash 'B'");
+		loggerSupport.dumpByteArrayInHex(keyClientToServer, "Hash 'C'");
+		loggerSupport.dumpByteArrayInHex(keyServerToClient, "Hash 'D'");
+		loggerSupport.dumpByteArrayInHex(integrityKeyClientToServer, "Hash 'E'");
+		loggerSupport.dumpByteArrayInHex(integrityKeyServerToClient, "Hash 'F'");
 
 		connection.setServerToClientCipher(serverToClientCipher);
 		connection.setClientToServerCipher(clientToServerCipher);
 		connection.setClientToServerMac(clientToServerMac);
 		connection.setServerToClientMac(serverToClientMac);
-	}
-
-	private void dumpByteArray(byte[] integrityKeyServerToClient, String string) {
-		System.out.println(string);
-		for (int i = 0; i < integrityKeyServerToClient.length; ++i) {
-			System.out.printf("%02x", integrityKeyServerToClient[i]);
-		}
-		System.out.println();
 	}
 
 	private SshString signHash(SshString hash) throws Exception {
@@ -143,7 +136,6 @@ public class DiffieHellmanExchange {
 	private DhGexInit readDhGexInit(SshConnection connection) throws IOException {
 		byte[] packet = dataExchangeService.readPacket(connection);
 		DhGexInit dhGexInit = new DhGexInit(packet);
-		System.out.println(dhGexInit);
 		return dhGexInit;
 	}
 
@@ -183,21 +175,20 @@ public class DiffieHellmanExchange {
 		byteStream.write(connection.getLocaleIdentificationMessage().serialize());
 		byteStream.write(connection.getRemoteKexMessage().serialize());
 		byteStream.write(connection.getLocaleKexMessage().serialize());
-		byteStream.write(publicKeyProvider.provide().serialize());
-		byteStream.write(ByteConverterUtils.intToByte(dhKeySize.getMinimumLength()));
-		byteStream.write(ByteConverterUtils.intToByte(dhKeySize.getPreferredLength()));
-		byteStream.write(ByteConverterUtils.intToByte(dhKeySize.getMaximumLength()));
+		byteStream.write(dsaKeyProvider.providePublicKey().serialize());
+		byteStream.write(ByteConverterUtils.intToByteArray(dhKeySize.getMinimumLength()));
+		byteStream.write(ByteConverterUtils.intToByteArray(dhKeySize.getPreferredLength()));
+		byteStream.write(ByteConverterUtils.intToByteArray(dhKeySize.getMaximumLength()));
 		byteStream.write(dhGexResponse.getSafePrimeP().serialize());
 		byteStream.write(dhGexResponse.getGeneratorG().serialize());
 		byteStream.write(dhGexInit.getE().serialize());
 		byteStream.write(f.serialize());
 		byteStream.write(k.serialize());
 		byte[] bytesToHash = byteStream.toByteArray();
-		System.out.flush();
 		// TODO?
 		byte[] firstHash = hashFunction.hash(bytesToHash);
 		connection.setSessionId(firstHash);
-		dumpByteArray(firstHash, "FIRST_HASH");
 		return firstHash;
 	}
+
 }

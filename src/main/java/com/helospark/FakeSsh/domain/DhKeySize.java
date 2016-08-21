@@ -20,8 +20,8 @@ public class DhKeySize {
 	}
 
 	public void deserialize(byte[] data) {
-		this.minimumLength = ByteConverterUtils.byteToInt(data, 0);
-		this.preferredLength = ByteConverterUtils.byteToInt(data, 4);
-		this.maximumLength = ByteConverterUtils.byteToInt(data, 8);
+		this.minimumLength = ByteConverterUtils.byteArrayToInt(data, 0);
+		this.preferredLength = ByteConverterUtils.byteArrayToInt(data, 4);
+		this.maximumLength = ByteConverterUtils.byteArrayToInt(data, 8);
 	}
 }

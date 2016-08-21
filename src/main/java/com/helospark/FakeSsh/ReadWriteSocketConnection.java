@@ -5,6 +5,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
+/**
+ * Socket connection that can be read and written to.
+ * @author helospark
+ */
 public class ReadWriteSocketConnection {
 	private InputStream inputStream;
 	private OutputStream outputStream;
@@ -38,6 +42,17 @@ public class ReadWriteSocketConnection {
 
 	public void setSocket(Socket socket) {
 		this.socket = socket;
+	}
+
+	/**
+	 * Close the socket and all attached streams.
+	 */
+	public void close() {
+		try {
+			socket.close();
+		} catch (IOException e) {
+			// Ignore
+		}
 	}
 
 }

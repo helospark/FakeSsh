@@ -1,7 +1,13 @@
 package com.helospark.FakeSsh;
 
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 
+/**
+ * SSH packet type.
+ * See RFC 4250
+ * @author helospark
+ */
 public enum PacketType {
 	SSH_MSG_DISCONNECT((byte) 1),
 	SSH_MSG_IGNORE((byte) 2),
@@ -45,6 +51,12 @@ public enum PacketType {
 		return value;
 	}
 
+	/**
+	 * Gets the PacketType from a byte
+	 * @param type to get PacketType for
+	 * @return PacketType
+	 * @throws NoSuchElementException when the byte code is not a valid PacketType
+	 */
 	public static PacketType fromValue(byte type) {
 		return Arrays.stream(PacketType.values())
 				.filter(packetType -> packetType.getValue() == type)

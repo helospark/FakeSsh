@@ -63,6 +63,13 @@ public class NegotiatedAlgorithmList {
 		return new Builder();
 	}
 
+	@Override
+	public String toString() {
+		return "NegotiatedAlgorithmList [kexAlgorithms=" + kexAlgorithms + ", encryptionAlgorithmsClientToServer=" + encryptionAlgorithmsClientToServer + ", encryptionAlgorithmsServerToClient=" + encryptionAlgorithmsServerToClient
+				+ ", macAlgorithmsClientToServer=" + macAlgorithmsClientToServer + ", macAlgorithmsServerToClient=" + macAlgorithmsServerToClient + ", compressionAlgorithmsClientToServer=" + compressionAlgorithmsClientToServer
+				+ ", compressionAlgorithmsServerToClient=" + compressionAlgorithmsServerToClient + ", languagesClientToServer=" + languagesClientToServer + ", languagesServerToClient=" + languagesServerToClient + "]";
+	}
+
 	public static class Builder {
 		private String kexAlgorithms;
 		private String encryptionAlgorithmsClientToServer;

@@ -3,11 +3,12 @@ package com.helospark.FakeSsh.domain;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
+import com.helospark.FakeSsh.ApplicationConstants;
 import com.helospark.FakeSsh.PacketType;
 
 public class SshServiceRequest {
 	private PacketType type;
-	private SshString service;
+	private String service;
 
 	public SshServiceRequest(byte[] data) throws IOException {
 		this.deserialize(data);
@@ -21,12 +22,12 @@ public class SshServiceRequest {
 		this.type = type;
 	}
 
-	public SshString getService() {
+	public String getService() {
 		return service;
 	}
 
-	public void setService(SshString message) {
-		this.service = message;
+	public void setService(String service) {
+		this.service = service;
 	}
 
 	public void deserialize(byte[] data) throws IOException {
@@ -35,6 +36,6 @@ public class SshServiceRequest {
 		if (this.type != PacketType.SSH_MSG_SERVICE_REQUEST) {
 			throw new RuntimeException("Unexpected packetType " + type);
 		}
-		this.service = new SshString(byteStream);
+		this.service = new String(new SshString(byteStream).serialize(), ApplicationConstants.SSH_CHARSET);
 	}
 }

@@ -6,6 +6,12 @@ import com.helospark.FakeSsh.domain.MpInt;
 import com.helospark.FakeSsh.domain.NegotiatedAlgorithmList;
 import com.helospark.FakeSsh.domain.SshString;
 
+/**
+ * Represents all the states that a given SSH connection needs.
+ * Note: Some of the fields are initially null or empty and are filled 
+ * out throught the initialization process
+ * @author helospark
+ */
 public class SshConnection {
 	private ReadWriteSocketConnection connection;
 	private SshString localeIdentificationMessage;
@@ -23,6 +29,7 @@ public class SshConnection {
 	private Optional<SshMac> serverToClientMac = Optional.empty();
 	private int numberOfSentPackeges = 0;
 	private int numberOfReceivedPackages = 0;
+	private boolean connectionClosed = false;
 
 	public ReadWriteSocketConnection getConnection() {
 		return connection;
@@ -150,5 +157,19 @@ public class SshConnection {
 
 	public void incrementNumberOfSentPackages() {
 		++numberOfSentPackeges;
+	}
+
+	public boolean isConnectionClosed() {
+		return connectionClosed;
+	}
+
+	public void setConnectionClosed(boolean connectionClosed) {
+		this.connectionClosed = connectionClosed;
+	}
+
+	public String getRemoteIpAsString() {
+		return Optional.ofNullable(connection)
+				.map(connection -> connection.getSocket().getInetAddress().getHostAddress())
+				.orElse("N/A");
 	}
 }

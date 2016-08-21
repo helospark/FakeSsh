@@ -5,11 +5,22 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.Arrays;
 
+/**
+ * General HMAC algorithm that uses {@link MessageDigest} as a hash.
+ * See RFC 2104 for the explanation of the implementation
+ * @author helospark
+ */
 public class MessageDigestBackedHMacAlgorithm {
 	private MessageDigest messageDigest;
 	private byte[] ipadXored;
 	private byte[] opadXored;
 
+	/**
+	 * Constructor.
+	 * @param messageDigest the hash function implementation
+	 * @param key the data integrity key
+	 * @param blockSize block length of the hash function (unfortunately MessageDigest doesn't provide this)
+	 */
 	public MessageDigestBackedHMacAlgorithm(MessageDigest messageDigest, byte[] key, int blockSize) {
 		this.messageDigest = messageDigest;
 		initializeParameters(key, blockSize);
@@ -29,6 +40,12 @@ public class MessageDigestBackedHMacAlgorithm {
 		}
 	}
 
+	/**
+	 * Calculate the HMAC for the given message.
+	 * @param message to calculate HMAC for
+	 * @return the calculated HMAC
+	 * @throws IOException
+	 */
 	public byte[] createMac(byte[] message) throws IOException {
 		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
 		byteStream.write(ipadXored);

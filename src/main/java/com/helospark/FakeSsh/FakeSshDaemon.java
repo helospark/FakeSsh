@@ -5,38 +5,57 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+/**
+ * Daemon to orchestrate the connections to the Fake SSH service. 
+ * @author helospark
+ */
 @Component
 public class FakeSshDaemon {
-	private static final int SERVER_PORT = 2222;
 	private boolean isRunning = true;
 	private ServerSocket serverSocket;
-	private List<SshConnection> connections = new ArrayList<>();
-	private List<Runnable> tmp = new ArrayList<>();
-	private SshIdentificationExchanger identificationDataExchanger;
+	private List<SshConnection> establishedConnections = new ArrayList<>();
+	private ConnectionPermissionCheckingService connectionPermissionCheckingService;
+	private SshConnectionInitializer sshConnectionInitializer;
 
 	@Autowired
-	public FakeSshDaemon(SshIdentificationExchanger identificationDataExchanger) throws IOException {
-		serverSocket = new ServerSocket(SERVER_PORT);
-		this.identificationDataExchanger = identificationDataExchanger;
+	public FakeSshDaemon(ConnectionPermissionCheckingService connectionPermissionCheckingService, SshConnectionInitializer sshConnectionInitializer,
+			@Qualifier("fakeSshServerSocket") ServerSocket serverSocket) throws IOException {
+		this.serverSocket = serverSocket;
+		this.connectionPermissionCheckingService = connectionPermissionCheckingService;
+		this.sshConnectionInitializer = sshConnectionInitializer;
 	}
 
 	public void run() throws IOException {
-		while (isRunning) {
-			Socket connection = serverSocket.accept();
-			final SshConnection sshConnection = new SshConnection();
-			ReadWriteSocketConnection readWriteConnection = new ReadWriteSocketConnection(connection);
-			sshConnection.setConnection(readWriteConnection);
-			new Runnable() {
-				@Override
-				public void run() {
-					identificationDataExchanger.exchangeIdentification(sshConnection);
-				}
-			}.run();
-			connections.add(sshConnection);
+		while (isRunning()) {
+			Socket newConnection = serverSocket.accept();
+			if (connectionPermissionCheckingService.isConnectionAllowed(establishedConnections, newConnection)) {
+				SshConnection sshConnection = sshConnectionInitializer.createSshConnection(newConnection);
+				establishedConnections.add(sshConnection);
+			} else {
+				newConnection.close();
+			}
+			clearOldConnections();
 		}
+	}
+
+	private void clearOldConnections() {
+		establishedConnections = establishedConnections.stream()
+				.filter(connection -> !connection.isConnectionClosed())
+				.collect(Collectors.toList());
+	}
+
+	// TODO: When to turn of running?
+	public void setRunning(boolean isRunning) {
+		this.isRunning = isRunning;
+	}
+
+	private boolean isRunning() {
+		return isRunning;
 	}
 }

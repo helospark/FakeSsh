@@ -3,6 +3,10 @@ package com.helospark.FakeSsh;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+/**
+ * SSH HMAC that uses MessageDigest as the hash function implementation.
+ * @author helospark
+ */
 public class MessageDigestBackedSshHmac implements SshMac {
 	private MessageDigestBackedHMacAlgorithm messageDigestBackedHMacAlgorithm;
 
@@ -13,7 +17,7 @@ public class MessageDigestBackedSshHmac implements SshMac {
 	@Override
 	public byte[] createMac(byte[] message, int packageNumber) throws IOException {
 		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-		byteStream.write(ByteConverterUtils.intToByte(packageNumber));
+		byteStream.write(ByteConverterUtils.intToByteArray(packageNumber));
 		byteStream.write(message);
 		return messageDigestBackedHMacAlgorithm.createMac(byteStream.toByteArray());
 	}
@@ -21,7 +25,7 @@ public class MessageDigestBackedSshHmac implements SshMac {
 	@Override
 	public boolean checkMac(byte[] message, byte[] mac, int packageNumber) throws IOException {
 		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-		byteStream.write(ByteConverterUtils.intToByte(packageNumber));
+		byteStream.write(ByteConverterUtils.intToByteArray(packageNumber));
 		byteStream.write(message);
 		return messageDigestBackedHMacAlgorithm.checkMac(byteStream.toByteArray(), mac);
 	}
