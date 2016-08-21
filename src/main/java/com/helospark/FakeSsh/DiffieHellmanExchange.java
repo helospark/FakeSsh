@@ -57,30 +57,31 @@ public class DiffieHellmanExchange {
 			MpInt f = new MpInt(prime.getGenerator().modPow(y, prime.getPrime()));
 			MpInt k = new MpInt(dhGexInit.getE().getBigInteger().modPow(y, prime.getPrime()));
 
-			SshString hash = calculateHash(connection, dhKeySize, dhGexResponse, dhGexInit, f, k);
+			byte[] hash = calculateHash(connection, dhKeySize, dhGexResponse, dhGexInit, f, k);
+			SshString correctedHash = new SshString(hashFunction.hash(hash));
 
 			DhGexReply dhGexReply = new DhGexReply();
 			dhGexReply.setPacketType(PacketType.SSH_MSG_KEX_DH_GEX_REPLY);
 			dhGexReply.setPublicKey(dssSignatureService.providePublicKey());
 			dhGexReply.setF(f);
 
-			dhGexReply.setHash(signHash(hash));
+			dhGexReply.setHash(signHash(correctedHash));
 
 			connection.setKey(k);
 			connection.setHash(hash);
-			connection.setSessionId(hash);
 
 			dumpBigInteger(k.getBigInteger().toByteArray(), "shared key");
 			dumpBigInteger(publicKeyProvider.provide().serialize(), "Public key");
 
 			dataExchangeService.sendPacket(connection, dhGexReply.serialize());
 
-			dataExchangeService.sendPacket(connection, new byte[] { PacketType.SSH_MSG_NEWKEYS.getValue() });
-
 			byte[] newKeyResult = dataExchangeService.readPacket(connection);
 			if (PacketType.fromValue(newKeyResult[0]) != PacketType.SSH_MSG_NEWKEYS) {
 				throw new RuntimeException("Unexpected packet");
 			}
+
+			dataExchangeService.sendPacket(connection, new byte[] { PacketType.SSH_MSG_NEWKEYS.getValue() });
+
 			calculateKeys(connection);
 			next.handleServiceRequest(connection);
 		} catch (Exception e) {
@@ -111,10 +112,25 @@ public class DiffieHellmanExchange {
 		SshMac clientToServerMac = sshMacFactory.createMac(negotiatedAlgorithms.getMacAlgorithmsClientToServer(), integrityKeyClientToServer);
 		SshMac serverToClientMac = sshMacFactory.createMac(negotiatedAlgorithms.getMacAlgorithmsServerToClient(), integrityKeyServerToClient);
 
+		dumpByteArray(ivClientToServer, "A");
+		dumpByteArray(ivServerToClient, "B");
+		dumpByteArray(keyClientToServer, "C");
+		dumpByteArray(keyServerToClient, "D");
+		dumpByteArray(integrityKeyClientToServer, "E");
+		dumpByteArray(integrityKeyServerToClient, "F");
+
 		connection.setServerToClientCipher(serverToClientCipher);
 		connection.setClientToServerCipher(clientToServerCipher);
 		connection.setClientToServerMac(clientToServerMac);
 		connection.setServerToClientMac(serverToClientMac);
+	}
+
+	private void dumpByteArray(byte[] integrityKeyServerToClient, String string) {
+		System.out.println(string);
+		for (int i = 0; i < integrityKeyServerToClient.length; ++i) {
+			System.out.printf("%02x", integrityKeyServerToClient[i]);
+		}
+		System.out.println();
 	}
 
 	private SshString signHash(SshString hash) throws Exception {
@@ -161,7 +177,7 @@ public class DiffieHellmanExchange {
 		return dhGexResponse;
 	}
 
-	private SshString calculateHash(SshConnection connection, DhKeySize dhKeySize, DhGexResponse dhGexResponse, DhGexInit dhGexInit, MpInt f, MpInt k) throws IOException {
+	private byte[] calculateHash(SshConnection connection, DhKeySize dhKeySize, DhGexResponse dhGexResponse, DhGexInit dhGexInit, MpInt f, MpInt k) throws IOException {
 		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
 		byteStream.write(connection.getRemoteIdentificationMessage().serialize());
 		byteStream.write(connection.getLocaleIdentificationMessage().serialize());
@@ -179,7 +195,9 @@ public class DiffieHellmanExchange {
 		byte[] bytesToHash = byteStream.toByteArray();
 		System.out.flush();
 		// TODO?
-		byte[] result = hashFunction.hash(hashFunction.hash(bytesToHash));
-		return new SshString(result);
+		byte[] firstHash = hashFunction.hash(bytesToHash);
+		connection.setSessionId(firstHash);
+		dumpByteArray(firstHash, "FIRST_HASH");
+		return firstHash;
 	}
 }

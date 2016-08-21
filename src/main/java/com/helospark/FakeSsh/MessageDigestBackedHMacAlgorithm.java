@@ -5,42 +5,34 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.Arrays;
 
-import org.springframework.beans.factory.InitializingBean;
-
-public class MessageDigestBackedMacAlgorithm implements SshMac, InitializingBean {
+public class MessageDigestBackedHMacAlgorithm {
 	private MessageDigest messageDigest;
-	private int blockSize;
-	private byte[] key;
 	private byte[] ipadXored;
 	private byte[] opadXored;
 
-	public MessageDigestBackedMacAlgorithm(MessageDigest messageDigest, byte[] key, int blockSize) {
+	public MessageDigestBackedHMacAlgorithm(MessageDigest messageDigest, byte[] key, int blockSize) {
 		this.messageDigest = messageDigest;
-		this.blockSize = blockSize;
-		this.key = key;
+		initializeParameters(key, blockSize);
 	}
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
+	private void initializeParameters(byte[] key, int blockSize) {
 		byte[] keyPadded = new byte[blockSize];
+		if (key.length > blockSize) {
+			key = messageDigest.digest(key);
+		}
 		System.arraycopy(key, 0, keyPadded, 0, key.length);
 		ipadXored = new byte[blockSize];
 		opadXored = new byte[blockSize];
 		for (int i = 0; i < blockSize; ++i) {
 			ipadXored[i] = (byte) (keyPadded[i] ^ (byte) 0x36);
-			opadXored[i] = (byte) (keyPadded[i] ^ (byte) 0x36);
+			opadXored[i] = (byte) (keyPadded[i] ^ (byte) 0x5c);
 		}
 	}
 
-	@Override
-	public byte[] createMac(byte[] message, int packageNumber) throws IOException {
+	public byte[] createMac(byte[] message) throws IOException {
 		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-		byteStream.write(ByteConverterUtils.intToByte(packageNumber));
-		byteStream.write(message);
-		byte[] messageToDigest = byteStream.toByteArray();
-		byteStream.reset();
 		byteStream.write(ipadXored);
-		byteStream.write(messageToDigest);
+		byteStream.write(message);
 		byte[] inner = byteStream.toByteArray();
 		synchronized (messageDigest) {
 			byte[] digestedInner = messageDigest.digest(inner);
@@ -51,12 +43,10 @@ public class MessageDigestBackedMacAlgorithm implements SshMac, InitializingBean
 		}
 	}
 
-	@Override
-	public boolean checkMac(byte[] message, byte[] mac, int packageNumber) throws IOException {
-		return Arrays.equals(mac, createMac(message, packageNumber));
+	public boolean checkMac(byte[] message, byte[] mac) throws IOException {
+		return Arrays.equals(mac, createMac(message));
 	}
 
-	@Override
 	public int getMacLength() {
 		return messageDigest.getDigestLength();
 	}

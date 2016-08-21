@@ -2,12 +2,14 @@ package com.helospark.FakeSsh;
 
 import static com.helospark.FakeSsh.ApplicationConstants.SSH_PROTOCOL_STRING_ENCODING_CHARSET;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Optional;
 
+import org.bouncycastle.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -58,8 +60,9 @@ public class SshDataExchangeService {
 	}
 
 	public void sendPacket(SshConnection connection, byte[] bytesToSend) throws IOException {
-		byte[] encryptedPacket = createEncryptedPacket(connection, bytesToSend);
-		byte[] macBytes = calculateMac(connection, bytesToSend);
+		byte[] nonEncryptedPacket = createNonncryptedPacket(connection, bytesToSend);
+		byte[] encryptedPacket = encryptPacket(connection, nonEncryptedPacket);
+		byte[] macBytes = calculateMac(connection, nonEncryptedPacket);
 
 		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
 		byteStream.write(encryptedPacket);
@@ -71,7 +74,7 @@ public class SshDataExchangeService {
 		connection.incrementNumberOfSentPackages();
 	}
 
-	private byte[] createEncryptedPacket(SshConnection connection, byte[] bytesToSend) throws IOException {
+	private byte[] createNonncryptedPacket(SshConnection connection, byte[] bytesToSend) throws IOException {
 		int fullSizeWithoutPadding = PACKET_LENGTH_FIELD_SIZE + PADDING_LENGTH_FIELD_SIZE + bytesToSend.length;
 		byte paddingSize = calculatePaddingSize(fullSizeWithoutPadding);
 		int packetLength = PADDING_LENGTH_FIELD_SIZE + bytesToSend.length + paddingSize;
@@ -80,7 +83,7 @@ public class SshDataExchangeService {
 		byteStream.write(paddingSize);
 		byteStream.write(bytesToSend);
 		byteStream.write(randomNumberGenerator.generateRandomBytes(paddingSize));
-		return encryptPacket(connection, byteStream.toByteArray());
+		return byteStream.toByteArray();
 	}
 
 	private byte[] encryptPacket(SshConnection connection, byte[] byteArray) {
@@ -98,42 +101,65 @@ public class SshDataExchangeService {
 	}
 
 	public byte[] readPacket(SshConnection connection) throws IOException {
-		byte[] packetSizeAsByteArray = new byte[4];
+		byte[] packet = new byte[65000];
 		InputStream inputStream = connection.getConnection().getInputStream();
-		inputStream.read(packetSizeAsByteArray);
-		int availableBytes = inputStream.available();
-		int packageSize = ByteConverterUtils.byteToInt(packetSizeAsByteArray);
-		byte[] readBytes = new byte[packageSize];
-		inputStream.read(readBytes);
-
-		byte[] decryptedPacket = decryptPacket(connection, readBytes);
-
-		byte paddingSize = decryptedPacket[0];
-		byte[] result = new byte[decryptedPacket.length - paddingSize - 1];
-		System.arraycopy(decryptedPacket, 1, result, 0, result.length);
-
-		if (!isMacValid(connection, decryptedPacket)) {
+		while (inputStream.available() <= 0) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				return new byte[0];
+			}
+		}
+		int readBytes = inputStream.read(packet);
+		byte[] decryptedPacket = decryptPacket(connection, packet, readBytes);
+		byte[] macBytes = extractMac(connection, packet, readBytes);
+		if (!isMacValid(connection, decryptedPacket, macBytes)) {
 			throw new RuntimeException("MAC is not valid");
 		}
+
+		ByteArrayInputStream inputByteStream = new ByteArrayInputStream(decryptedPacket);
+		byte[] packetSizeAsByteArray = readBytes(inputByteStream, 4);
+		int packageSize = ByteConverterUtils.byteToInt(packetSizeAsByteArray);
+		byte paddingSize = (byte) inputByteStream.read();
+		byte[] result = readBytes(inputByteStream, packageSize - paddingSize - 1);
 		connection.incrementNumberOfReceivedPackages();
 		return result;
 	}
 
-	private byte[] decryptPacket(SshConnection connection, byte[] readBytes) {
-		Optional<SshCipher> optionalCipher = connection.getClientToServerCipher();
-		return optionalCipher.map(cipher -> cipher.decrypt(readBytes)).orElse(readBytes);
+	private byte[] extractMac(SshConnection connection, byte[] packet, int readBytes) {
+		Optional<SshMac> optionalMac = connection.getClientToServerMac();
+		if (optionalMac.isPresent()) {
+			int macLength = optionalMac.get().getMacLength();
+			byte[] macBytes = new byte[macLength];
+			System.arraycopy(packet, readBytes - macLength, macBytes, 0, macLength);
+			return macBytes;
+		}
+		return new byte[0];
 	}
 
-	private boolean isMacValid(SshConnection connection, byte[] decryptedPacket) throws IOException {
+	private byte[] readBytes(InputStream inputStream, int size) throws IOException {
+		byte[] dataRead = new byte[size];
+		inputStream.read(dataRead);
+		return dataRead;
+	}
+
+	private byte[] decryptPacket(SshConnection connection, byte[] bytes, int numberOfReadBytes) {
+		Optional<SshCipher> optionalCipher = connection.getClientToServerCipher();
+		byte[] subArray = Arrays.copyOfRange(bytes, 0, numberOfReadBytes - numberOfMacBytes(connection));
+		return optionalCipher.map(cipher -> cipher.decrypt(subArray)).orElse(subArray);
+	}
+
+	private int numberOfMacBytes(SshConnection connection) {
+		return connection.getClientToServerMac()
+				.map(mac -> mac.getMacLength())
+				.orElse(0);
+	}
+
+	private boolean isMacValid(SshConnection connection, byte[] decryptedPacket, byte[] macBytes) throws IOException {
 		Optional<SshMac> optionalMac = connection.getClientToServerMac();
 		if (optionalMac.isPresent()) {
 			SshMac mac = optionalMac.get();
-			int macLength = mac.getMacLength();
-			byte[] macBytes = new byte[macLength];
-			System.arraycopy(decryptedPacket, decryptedPacket.length - macLength - 1, macBytes, 0, macLength);
-			byte[] packetBytes = new byte[decryptedPacket.length - macLength];
-			System.arraycopy(decryptedPacket, 0, packetBytes, 0, decryptedPacket.length - macLength);
-			return mac.checkMac(packetBytes, macBytes, connection.getNumberOfReceivedPackages());
+			return mac.checkMac(decryptedPacket, macBytes, connection.getNumberOfReceivedPackages());
 		}
 		return true;
 	}

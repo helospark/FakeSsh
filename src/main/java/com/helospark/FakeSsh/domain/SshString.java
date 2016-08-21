@@ -27,11 +27,6 @@ public class SshString {
 		this.payload = payload;
 	}
 
-	public SshString(byte[] byteArray, int startIndex) {
-		payload = new byte[byteArray.length - startIndex];
-		System.arraycopy(byteArray, 0, payload, 0, payload.length);
-	}
-
 	public byte[] serialize() throws UnsupportedEncodingException, IOException {
 		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
 		byteStream.write(ByteConverterUtils.intToByte(payload.length));
@@ -51,4 +46,14 @@ public class SshString {
 	public byte[] getData() {
 		return payload;
 	}
+
+	@Override
+	public String toString() {
+		try {
+			return "SshString [payload=" + new String(payload, ApplicationConstants.SSH_PROTOCOL_STRING_ENCODING_CHARSET) + "]";
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException("Unsopperted encoding", e);
+		}
+	}
+
 }

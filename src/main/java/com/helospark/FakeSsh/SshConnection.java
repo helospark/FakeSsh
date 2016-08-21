@@ -12,8 +12,8 @@ public class SshConnection {
 	private SshString remoteIdentificationMessage;
 	private SshString remoteKexMessage;
 	private SshString localeKexMessage;
-	private SshString hash;
-	private SshString sessionId;
+	private byte[] hash;
+	private byte[] sessionId;
 	private MpInt key;
 	private SshHash hashFunction;
 	private NegotiatedAlgorithmList negotiatedAlgoritms;
@@ -68,11 +68,11 @@ public class SshConnection {
 		this.key = k;
 	}
 
-	public void setHash(SshString hash) {
-		this.hash = hash;
+	public void setHash(byte[] correctedHash) {
+		this.hash = correctedHash;
 	}
 
-	public SshString getHash() {
+	public byte[] getHash() {
 		return hash;
 	}
 
@@ -80,11 +80,11 @@ public class SshConnection {
 		return key;
 	}
 
-	public void setSessionId(SshString sessionId) {
+	public void setSessionId(byte[] sessionId) {
 		this.sessionId = sessionId;
 	}
 
-	public SshString getSessionId() {
+	public byte[] getSessionId() {
 		return sessionId;
 	}
 

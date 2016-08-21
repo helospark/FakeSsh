@@ -29,8 +29,8 @@ public class SshCipherFactory {
 		Cipher decryptCipher;
 		switch (name) {
 		case "aes128-ctr":
-			encryptCipher = createEncryptionCipher("AES/CBC/PKCS5Padding", "AES", Cipher.ENCRYPT_MODE, key, iv);
-			decryptCipher = createEncryptionCipher("AES/CBC/PKCS5Padding", "AES", Cipher.DECRYPT_MODE, key, iv);
+			encryptCipher = createEncryptionCipher("AES/CTR/NoPadding", "AES", Cipher.ENCRYPT_MODE, key, iv);
+			decryptCipher = createEncryptionCipher("AES/CTR/NoPadding", "AES", Cipher.DECRYPT_MODE, key, iv);
 			return new SunBackedCipher(encryptCipher, decryptCipher);
 		case "3des-cbc":
 			encryptCipher = createEncryptionCipher("DESede/CBC/PKCS5Padding", "DESede", Cipher.ENCRYPT_MODE, key, iv);

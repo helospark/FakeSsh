@@ -58,12 +58,12 @@ public class SshSupportedAlgorithmExchange {
 		algorithmNegotiationList.firstKeyPacketFollow = (byte) 0;
 		algorithmNegotiationList.kexAlgorithms = new AlgorithmNegotiationNameList(Collections.singletonList("diffie-hellman-group-exchange-sha1"));
 		algorithmNegotiationList.serverHostKeyAlgorithms = new AlgorithmNegotiationNameList(Collections.singletonList("ssh-dss"));
-		algorithmNegotiationList.encryptionAlgorithmsClientToServer = new AlgorithmNegotiationNameList(Arrays.asList("aes128-ctr", "3des-cbc"));
-		algorithmNegotiationList.encryptionAlgorithmsServerToClient = new AlgorithmNegotiationNameList(Arrays.asList("aes128-ctr", "3des-cbc"));
+		algorithmNegotiationList.encryptionAlgorithmsClientToServer = new AlgorithmNegotiationNameList(Arrays.asList("aes128-ctr"));
+		algorithmNegotiationList.encryptionAlgorithmsServerToClient = new AlgorithmNegotiationNameList(Arrays.asList("aes128-ctr"));
 		algorithmNegotiationList.macAlgorithmsClientToServer = new AlgorithmNegotiationNameList(Collections.singletonList("hmac-sha1"));
 		algorithmNegotiationList.macAlgorithmsServerToClient = new AlgorithmNegotiationNameList(Collections.singletonList("hmac-sha1"));
-		algorithmNegotiationList.compressionAlgorithmsClientToServer = new AlgorithmNegotiationNameList(Arrays.asList("none", "zlib"));
-		algorithmNegotiationList.compressionAlgorithmsServerToClient = new AlgorithmNegotiationNameList(Arrays.asList("none", "zlib"));
+		algorithmNegotiationList.compressionAlgorithmsClientToServer = new AlgorithmNegotiationNameList(Arrays.asList("none"));
+		algorithmNegotiationList.compressionAlgorithmsServerToClient = new AlgorithmNegotiationNameList(Arrays.asList("none"));
 		algorithmNegotiationList.languagesClientToServer = new AlgorithmNegotiationNameList(Collections.<String> emptyList());
 		algorithmNegotiationList.languagesServerToClient = new AlgorithmNegotiationNameList(Collections.<String> emptyList());
 		return algorithmNegotiationList;

@@ -26,7 +26,7 @@ public class DiffieHellmanHashService {
 
 		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
 		byteStream.write(connection.getKey().serialize());
-		byteStream.write(connection.getHash().serialize());
+		byteStream.write(connection.getHash());
 		byte[] previousHash = hash;
 		SshHash sshHash = connection.getHashFunction();
 		while (outputHash.size() < minimumHashSize) {
@@ -41,10 +41,15 @@ public class DiffieHellmanHashService {
 	private byte[] initialHash(SshConnection connection, char identifier) throws IOException, UnsupportedEncodingException {
 		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
 		byteStream.write(connection.getKey().serialize());
-		byteStream.write(connection.getHash().serialize());
+		byteStream.write(connection.getHash());
 		byteStream.write((byte) identifier);
-		byteStream.write(connection.getSessionId().serialize());
+		byteStream.write(connection.getSessionId());
 		byte[] byteArray = byteStream.toByteArray();
+		System.out.printf("[[[[[[[[[[[[[[[[[[[[[%c]]]]]]]]]]]]]]]]]]]]]", identifier);
+		for (int i = 0; i < byteArray.length; ++i) {
+			System.out.printf("%02x", byteArray[i]);
+		}
+		System.out.println();
 		SshHash sshHash = connection.getHashFunction();
 		return sshHash.hash(byteArray);
 	}

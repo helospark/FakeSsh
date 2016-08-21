@@ -34,9 +34,9 @@ public class NegotitatedAlgorithmExtractor {
 
 	}
 
-	private String extractFirstMatch(AlgorithmNegotiationNameList clientList, AlgorithmNegotiationNameList serverList, boolean required) {
-		for (String clientElement : clientList.getElements()) {
-			if (serverList.getElements().indexOf(clientElement) != -1) {
+	private String extractFirstMatch(AlgorithmNegotiationNameList serverList, AlgorithmNegotiationNameList clientList, boolean required) {
+		for (String clientElement : serverList.getElements()) {
+			if (clientList.getElements().indexOf(clientElement) != -1) {
 				return clientElement;
 			}
 		}
