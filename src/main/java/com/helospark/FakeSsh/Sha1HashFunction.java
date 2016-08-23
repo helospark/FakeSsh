@@ -1,6 +1,8 @@
 package com.helospark.FakeSsh;
 
-import org.apache.commons.codec.digest.DigestUtils;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 import org.springframework.stereotype.Component;
 
 /**
@@ -12,6 +14,10 @@ public class Sha1HashFunction implements HashFunction {
 
 	@Override
 	public byte[] hash(byte[] value) {
-		return DigestUtils.getSha1Digest().digest(value);
+		try {
+			return MessageDigest.getInstance("SHA-1").digest(value);
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException("No SHA1 found");
+		}
 	}
 }

@@ -1,11 +1,20 @@
 package com.helospark.FakeSsh.domain;
 
+import static com.helospark.FakeSsh.ApplicationConstants.BYTE_SIZE;
+import static com.helospark.FakeSsh.ApplicationConstants.INTEGER_LENGTH_IN_BYTES;
+
 import com.helospark.FakeSsh.ByteConverterUtils;
+import com.helospark.FakeSsh.PacketType;
 
 public class DhKeySize {
+	private PacketType type;
 	private int minimumLength;
 	private int preferredLength;
 	private int maximumLength;
+
+	public DhKeySize(byte[] data) {
+		deserialize(data);
+	}
 
 	public int getMinimumLength() {
 		return minimumLength;
@@ -20,8 +29,12 @@ public class DhKeySize {
 	}
 
 	public void deserialize(byte[] data) {
-		this.minimumLength = ByteConverterUtils.byteArrayToInt(data, 0);
-		this.preferredLength = ByteConverterUtils.byteArrayToInt(data, 4);
-		this.maximumLength = ByteConverterUtils.byteArrayToInt(data, 8);
+		this.type = PacketType.fromValue(data[0]);
+		if (this.type != PacketType.SSH_MSG_KEX_DH_GEX_REQUEST) {
+			throw new RuntimeException("Not expected package");
+		}
+		this.minimumLength = ByteConverterUtils.byteArrayToInt(data, BYTE_SIZE + INTEGER_LENGTH_IN_BYTES * 0);
+		this.preferredLength = ByteConverterUtils.byteArrayToInt(data, BYTE_SIZE + INTEGER_LENGTH_IN_BYTES * 1);
+		this.maximumLength = ByteConverterUtils.byteArrayToInt(data, BYTE_SIZE + INTEGER_LENGTH_IN_BYTES * 2);
 	}
 }

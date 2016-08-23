@@ -3,7 +3,6 @@ package com.helospark.FakeSsh;
 /**
  * Common constants for this application.
  * @author helospark
- *
  */
 public class ApplicationConstants {
 	public static final String SSH_CHARSET = "utf-8";
@@ -14,4 +13,5 @@ public class ApplicationConstants {
 	public static final int MINIMUM_PADDING_SIZE = 4;
 	public static final int DEFAULT_PACKET_LENGTH_ALIGNMENT = 8;
 	public static final int MAX_PACKET_SIZE = 65000;
+	public static final int MAX_STRING_SIZE = 10000;
 }

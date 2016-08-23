@@ -26,6 +26,7 @@ public class SshStartState implements SshState {
 			loggerSupport.logException(e);
 		} finally {
 			sshConnection.getConnection().close();
+			sshConnection.setConnectionClosed(true);
 			String ip = sshConnection.getRemoteIpAsString();
 			loggerSupport.logInfoString("Connection was closed with " + ip);
 		}

@@ -5,10 +5,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 
-import org.bouncycastle.util.Arrays;
 import org.springframework.stereotype.Component;
 
+import com.helospark.FakeSsh.ApplicationConstants;
 import com.helospark.FakeSsh.ByteConverterUtils;
+import com.helospark.FakeSsh.ConnectionClosedException;
 import com.helospark.FakeSsh.SshCipher;
 
 /**
@@ -17,7 +18,6 @@ import com.helospark.FakeSsh.SshCipher;
  */
 @Component
 public class BinaryPacketReader {
-	private static final int MAXIMUM_PACKET_SIZE = 65000;
 
 	public byte[] readPacket(Optional<SshCipher> cipher, InputStream inputStream) throws IOException {
 		if (cipher.isPresent()) {
@@ -34,9 +34,19 @@ public class BinaryPacketReader {
 	 * @return read data
 	 */
 	private byte[] readEncryptedData(InputStream inputStream) throws IOException {
-		byte[] packet = new byte[MAXIMUM_PACKET_SIZE];
-		int readBytes = inputStream.read(packet);
-		return Arrays.copyOfRange(packet, 0, readBytes);
+		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+		byte[] buffer = new byte[1000];
+		do {
+			int readBytes = inputStream.read(buffer);
+			if (readBytes == -1) {
+				throw new ConnectionClosedException();
+			}
+			byteStream.write(buffer, 0, readBytes);
+		} while (inputStream.available() > 0 && byteStream.size() < ApplicationConstants.MAX_PACKET_SIZE);
+		if (byteStream.size() > ApplicationConstants.MAX_PACKET_SIZE) {
+			throw new RuntimeException("Too large packet");
+		}
+		return byteStream.toByteArray();
 	}
 
 	/**
@@ -49,6 +59,9 @@ public class BinaryPacketReader {
 	private byte[] readNonEncryptedData(InputStream inputStream) throws IOException {
 		byte[] packetSizeBytes = readPacketSize(inputStream);
 		int packetSize = convertPacketSizeToInt(packetSizeBytes);
+		if (packetSize > ApplicationConstants.MAX_PACKET_SIZE) {
+			throw new RuntimeException("Too large packet");
+		}
 		byte[] packet = readPacket(inputStream, packetSize);
 		return reconstructOriginalPacket(packetSizeBytes, packet);
 	}

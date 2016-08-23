@@ -17,6 +17,9 @@ public class DhGexInit {
 
 	public void deserialize(byte[] data) {
 		type = PacketType.fromValue(data[0]);
+		if (type != PacketType.SSH_MSG_KEX_DH_GEX_INIT) {
+			throw new RuntimeException("Unexpected packet");
+		}
 		int size = ByteConverterUtils.byteArrayToInt(data, 1);
 		int startIndex = ApplicationConstants.BYTE_SIZE + ApplicationConstants.INTEGER_LENGTH_IN_BYTES;
 		byte[] result = Arrays.copyOfRange(data, startIndex, startIndex + size);

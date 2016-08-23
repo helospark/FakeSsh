@@ -10,7 +10,7 @@ public interface AuthenticationHandler {
 
 	boolean canHandle(SshUserauthRequest sshUserauthRequest);
 
-	boolean isSuccessful(byte[] rawData) throws Exception;
+	boolean isSuccessful(byte[] rawData, final SshConnection connection) throws Exception;
 
 	String getHandledMethodName();
 

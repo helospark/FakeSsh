@@ -37,6 +37,9 @@ public class AlgorithmNegotiationList {
 		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);
 		byte typeAsByte = (byte) byteArrayInputStream.read();
 		type = PacketType.fromValue(typeAsByte);
+		if (type != PacketType.SSH_MSG_KEXINIT) {
+			throw new RuntimeException("Unexpected packet type");
+		}
 		cookie = new byte[COOKIE_SIZE];
 		byteArrayInputStream.read(cookie);
 		kexAlgorithms = readNamedListFromStream(byteArrayInputStream);

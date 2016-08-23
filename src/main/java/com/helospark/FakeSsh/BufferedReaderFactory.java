@@ -20,8 +20,7 @@ public class BufferedReaderFactory {
 
 	public BufferedReader createClasspathBufferedReader(String fileName) throws IOException {
 		Resource resource = new ClassPathResource(fileName);
-		File file = resource.getFile();
-		return createFromFile(file);
+		return new BufferedReader(new InputStreamReader(resource.getInputStream()));
 	}
 
 	public BufferedReader createFromFile(File file) throws FileNotFoundException {

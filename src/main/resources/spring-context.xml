@@ -6,5 +6,6 @@
 	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
     <context:component-scan base-package="com.helospark" />
-    <context:property-placeholder location="classpath:*.properties"/>
+    <context:property-placeholder location="file:appConfig.properties" ignore-resource-not-found="true" ignore-unresolvable="true" order="-1" />
+    <context:property-placeholder location="classpath:ssh-properties.properties" />
 </beans>

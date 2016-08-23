@@ -74,6 +74,9 @@ public class SshString {
 		byte[] sizeBytes = new byte[4];
 		byteArrayInputStream.read(sizeBytes);
 		int size = ByteConverterUtils.byteArrayToInt(sizeBytes);
+		if (size > ApplicationConstants.MAX_STRING_SIZE) {
+			throw new RuntimeException("String too long");
+		}
 		byte[] data = new byte[size];
 		byteArrayInputStream.read(data);
 		payload = data;

@@ -45,7 +45,7 @@ public class UserAuthHandler {
 		boolean partialSuccess = false;
 		for (AuthenticationHandler handler : authenticationHandler) {
 			if (handler.canHandle(sshUserauthRequest)) {
-				if (handler.isSuccessful(authRequest)) {
+				if (handler.isSuccessful(authRequest, connection)) {
 					sendAuthenticationSuccesfulMessage(connection);
 					succesfulAuthentication = true;
 				}

@@ -60,7 +60,7 @@ public class SshBinaryDataReaderService {
 
 	private byte[] readRawPacket(SshConnection connection) throws IOException {
 		InputStream inputStream = connection.getConnection().getInputStream();
-		waitForDataOrTimeout(connection, inputStream);
+		//		waitForDataOrTimeout(connection, inputStream);
 		byte[] packet = binaryPacketReader.readPacket(connection.getClientToServerCipher(), inputStream);
 		return packet;
 	}

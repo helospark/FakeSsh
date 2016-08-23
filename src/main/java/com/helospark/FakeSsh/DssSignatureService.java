@@ -10,6 +10,8 @@ import org.bouncycastle.crypto.signers.DSASigner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.helospark.FakeSsh.domain.SshString;
+
 /**
  * Used to sign data with the server's private key.
  * @author helospark
@@ -22,18 +24,21 @@ public class DssSignatureService {
 	private DsaKeyProvider dsaKeyProvider;
 	private DsaParametersConverter dsaParametersConverter;
 	private DsaSignerFactory dsaSignerFactory;
+	private Sha1HashFunction sha1HashFunction;
 
 	@Autowired
 	public DssSignatureService(DsaKeyProvider dsaKeyProvider, DsaParametersConverter dsaParametersConverter,
-			DsaSignerFactory dsaSignerFactory) {
+			DsaSignerFactory dsaSignerFactory, Sha1HashFunction sha1HashFunction) {
 		this.dsaKeyProvider = dsaKeyProvider;
 		this.dsaParametersConverter = dsaParametersConverter;
 		this.dsaSignerFactory = dsaSignerFactory;
+		this.sha1HashFunction = sha1HashFunction;
 	}
 
 	public byte[] sign(byte[] data) throws Exception {
+		byte[] correctedHash = new SshString(sha1HashFunction.hash(data)).getData(); // TODO! Not sure why another hashing is needed
 		DSASigner signer = createDsaSignerWithServerPrivateKey();
-		return signData(data, signer);
+		return signData(correctedHash, signer);
 	}
 
 	private DSASigner createDsaSignerWithServerPrivateKey() {
