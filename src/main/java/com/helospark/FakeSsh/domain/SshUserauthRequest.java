@@ -56,7 +56,7 @@ public class SshUserauthRequest {
 	protected void deserialize(ByteArrayInputStream byteStream) throws IOException {
 		type = PacketType.fromValue((byte) byteStream.read());
 		if (type != PacketType.SSH_MSG_USERAUTH_REQUEST) {
-			throw new RuntimeException("Unexpected packet");
+			throw new RuntimeException("Unexpected packet type (" + PacketType.SSH_MSG_USERAUTH_REQUEST + " != " + type);
 		}
 		username = new String(new SshString(byteStream).getData(), ApplicationConstants.SSH_CHARSET);
 		serviceName = new String(new SshString(byteStream).getData(), ApplicationConstants.SSH_CHARSET);

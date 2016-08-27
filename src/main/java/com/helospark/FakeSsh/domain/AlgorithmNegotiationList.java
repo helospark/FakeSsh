@@ -5,8 +5,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import com.helospark.FakeSsh.ByteConverterUtils;
 import com.helospark.FakeSsh.PacketType;
+import com.helospark.FakeSsh.util.ByteConverterUtils;
 
 public class AlgorithmNegotiationList {
 	private static final int COOKIE_SIZE = 16;
@@ -38,7 +38,7 @@ public class AlgorithmNegotiationList {
 		byte typeAsByte = (byte) byteArrayInputStream.read();
 		type = PacketType.fromValue(typeAsByte);
 		if (type != PacketType.SSH_MSG_KEXINIT) {
-			throw new RuntimeException("Unexpected packet type");
+			throw new RuntimeException("Unexpected packet type (" + PacketType.SSH_MSG_KEXINIT + " != " + type);
 		}
 		cookie = new byte[COOKIE_SIZE];
 		byteArrayInputStream.read(cookie);

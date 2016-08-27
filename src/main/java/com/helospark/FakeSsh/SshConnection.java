@@ -2,9 +2,13 @@ package com.helospark.FakeSsh;
 
 import java.util.Optional;
 
+import com.helospark.FakeSsh.cipher.SshCipher;
 import com.helospark.FakeSsh.domain.MpInt;
 import com.helospark.FakeSsh.domain.NegotiatedAlgorithmList;
 import com.helospark.FakeSsh.domain.SshString;
+import com.helospark.FakeSsh.hmac.SshMac;
+import com.helospark.FakeSsh.hostkey.ServerHostKeyAlgorithm;
+import com.helospark.FakeSsh.kex.hash.SshHash;
 
 /**
  * Represents all the states that a given SSH connection needs.
@@ -27,6 +31,7 @@ public class SshConnection {
 	private Optional<SshCipher> serverToClientCipher = Optional.empty();
 	private Optional<SshMac> clientToServerMac = Optional.empty();
 	private Optional<SshMac> serverToClientMac = Optional.empty();
+	private ServerHostKeyAlgorithm serverHostKeyAlgorithm;
 	private int numberOfSentPackeges = 0;
 	private int numberOfReceivedPackages = 0;
 	private boolean connectionClosed = false;
@@ -165,6 +170,14 @@ public class SshConnection {
 
 	public void setConnectionClosed(boolean connectionClosed) {
 		this.connectionClosed = connectionClosed;
+	}
+
+	public ServerHostKeyAlgorithm getKeyProvider() {
+		return serverHostKeyAlgorithm;
+	}
+
+	public void setKeyProvider(ServerHostKeyAlgorithm serverHostKeyAlgorithm) {
+		this.serverHostKeyAlgorithm = serverHostKeyAlgorithm;
 	}
 
 	public String getRemoteIpAsString() {

@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
-import com.helospark.FakeSsh.SshCipher;
+import com.helospark.FakeSsh.cipher.SshCipher;
 
 /**
  * Calculates the padding size for a packet.

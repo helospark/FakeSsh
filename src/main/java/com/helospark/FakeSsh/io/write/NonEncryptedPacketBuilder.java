@@ -10,9 +10,9 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.helospark.FakeSsh.ByteConverterUtils;
-import com.helospark.FakeSsh.RandomNumberGenerator;
-import com.helospark.FakeSsh.SshCipher;
+import com.helospark.FakeSsh.cipher.SshCipher;
+import com.helospark.FakeSsh.util.ByteConverterUtils;
+import com.helospark.FakeSsh.util.RandomNumberGenerator;
 
 /**
  * Builds a non encrypted packet from the given bytes.

@@ -7,7 +7,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
 import com.helospark.FakeSsh.ApplicationConstants;
-import com.helospark.FakeSsh.ByteConverterUtils;
+import com.helospark.FakeSsh.util.ByteConverterUtils;
 
 /**
  * Domain object to represent a String in the SSH protocol.

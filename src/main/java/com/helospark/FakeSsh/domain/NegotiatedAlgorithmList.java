@@ -2,6 +2,7 @@ package com.helospark.FakeSsh.domain;
 
 public class NegotiatedAlgorithmList {
 	private String kexAlgorithms;
+	private String serverKeyExchangeAlgorithm;
 	private String encryptionAlgorithmsClientToServer;
 	private String encryptionAlgorithmsServerToClient;
 	private String macAlgorithmsClientToServer;
@@ -12,15 +13,16 @@ public class NegotiatedAlgorithmList {
 	private String languagesServerToClient;
 
 	public NegotiatedAlgorithmList(Builder builder) {
-		kexAlgorithms = builder.kexAlgorithms;
-		encryptionAlgorithmsClientToServer = builder.encryptionAlgorithmsClientToServer;
-		encryptionAlgorithmsServerToClient = builder.encryptionAlgorithmsServerToClient;
-		macAlgorithmsClientToServer = builder.macAlgorithmsClientToServer;
-		macAlgorithmsServerToClient = builder.macAlgorithmsServerToClient;
-		compressionAlgorithmsClientToServer = builder.compressionAlgorithmsClientToServer;
-		compressionAlgorithmsServerToClient = builder.compressionAlgorithmsServerToClient;
-		languagesClientToServer = builder.languagesClientToServer;
-		languagesServerToClient = builder.languagesServerToClient;
+		this.kexAlgorithms = builder.kexAlgorithms;
+		this.encryptionAlgorithmsClientToServer = builder.encryptionAlgorithmsClientToServer;
+		this.encryptionAlgorithmsServerToClient = builder.encryptionAlgorithmsServerToClient;
+		this.macAlgorithmsClientToServer = builder.macAlgorithmsClientToServer;
+		this.macAlgorithmsServerToClient = builder.macAlgorithmsServerToClient;
+		this.compressionAlgorithmsClientToServer = builder.compressionAlgorithmsClientToServer;
+		this.compressionAlgorithmsServerToClient = builder.compressionAlgorithmsServerToClient;
+		this.languagesClientToServer = builder.languagesClientToServer;
+		this.languagesServerToClient = builder.languagesServerToClient;
+		this.serverKeyExchangeAlgorithm = builder.serverKeyExchangeAlgorithm;
 	}
 
 	public String getKexAlgorithm() {
@@ -63,11 +65,15 @@ public class NegotiatedAlgorithmList {
 		return new Builder();
 	}
 
+	public String getServerKeyExchangeAlgorithm() {
+		return serverKeyExchangeAlgorithm;
+	}
+
 	@Override
 	public String toString() {
-		return "NegotiatedAlgorithmList [kexAlgorithms=" + kexAlgorithms + ", encryptionAlgorithmsClientToServer=" + encryptionAlgorithmsClientToServer + ", encryptionAlgorithmsServerToClient=" + encryptionAlgorithmsServerToClient
-				+ ", macAlgorithmsClientToServer=" + macAlgorithmsClientToServer + ", macAlgorithmsServerToClient=" + macAlgorithmsServerToClient + ", compressionAlgorithmsClientToServer=" + compressionAlgorithmsClientToServer
-				+ ", compressionAlgorithmsServerToClient=" + compressionAlgorithmsServerToClient + ", languagesClientToServer=" + languagesClientToServer + ", languagesServerToClient=" + languagesServerToClient + "]";
+		return "NegotiatedAlgorithmList [kexAlgorithms=" + kexAlgorithms + ", serverKeyExchangeAlgorithm=" + serverKeyExchangeAlgorithm + ", encryptionAlgorithmsClientToServer=" + encryptionAlgorithmsClientToServer + ", encryptionAlgorithmsServerToClient="
+				+ encryptionAlgorithmsServerToClient + ", macAlgorithmsClientToServer=" + macAlgorithmsClientToServer + ", macAlgorithmsServerToClient=" + macAlgorithmsServerToClient + ", compressionAlgorithmsClientToServer="
+				+ compressionAlgorithmsClientToServer + ", compressionAlgorithmsServerToClient=" + compressionAlgorithmsServerToClient + ", languagesClientToServer=" + languagesClientToServer + ", languagesServerToClient=" + languagesServerToClient + "]";
 	}
 
 	public static class Builder {
@@ -80,6 +86,7 @@ public class NegotiatedAlgorithmList {
 		private String compressionAlgorithmsServerToClient;
 		private String languagesClientToServer;
 		private String languagesServerToClient;
+		private String serverKeyExchangeAlgorithm;
 
 		public Builder withKexAlgorithms(String kexAlgorithms) {
 			this.kexAlgorithms = kexAlgorithms;
@@ -123,6 +130,11 @@ public class NegotiatedAlgorithmList {
 
 		public Builder withLanguagesServerToClient(String languagesServerToClient) {
 			this.languagesServerToClient = languagesServerToClient;
+			return this;
+		}
+
+		public Builder withServerKeyExchangeAlgorithm(String serverKeyExchangeAlgorithm) {
+			this.serverKeyExchangeAlgorithm = serverKeyExchangeAlgorithm;
 			return this;
 		}
 

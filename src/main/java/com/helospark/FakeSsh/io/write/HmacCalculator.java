@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
-import com.helospark.FakeSsh.SshMac;
+import com.helospark.FakeSsh.hmac.SshMac;
 
 /**
  * Calculates the HMAC for the given packet.

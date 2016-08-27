@@ -6,7 +6,7 @@ import java.io.InputStream;
 
 import org.springframework.stereotype.Component;
 
-import com.helospark.FakeSsh.ByteConverterUtils;
+import com.helospark.FakeSsh.util.ByteConverterUtils;
 
 /**
  * Extracts payload from a decrypted SSH packet.

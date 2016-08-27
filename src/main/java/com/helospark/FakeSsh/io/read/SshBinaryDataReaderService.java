@@ -60,21 +60,12 @@ public class SshBinaryDataReaderService {
 
 	private byte[] readRawPacket(SshConnection connection) throws IOException {
 		InputStream inputStream = connection.getConnection().getInputStream();
-		//		waitForDataOrTimeout(connection, inputStream);
 		byte[] packet = binaryPacketReader.readPacket(connection.getClientToServerCipher(), inputStream);
 		return packet;
 	}
 
 	private boolean isMacValid(SshConnection connection, byte[] decryptedPacket, byte[] mac) throws IOException {
 		return packetMacValidator.isMacValid(connection.getClientToServerMac(), decryptedPacket, mac, connection.getNumberOfReceivedPackages());
-	}
-
-	private void waitForDataOrTimeout(SshConnection connection, InputStream inputStream) throws IOException {
-		boolean timeoutOccurred = inputStreamDataAvailableWaiter.waitForData(inputStream);
-		if (timeoutOccurred) {
-			connection.setConnectionClosed(true);
-			throw new ConnectionClosedException();
-		}
 	}
 
 }

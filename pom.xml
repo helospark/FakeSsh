@@ -73,7 +73,7 @@
           <archive>
             <manifest>
               <addClasspath>true</addClasspath>
-              <mainClass>com.helospark.FakeSsh.App</mainClass>
+              <mainClass>com.helospark.FakeSsh.FakeSshApplication</mainClass>
             </manifest>
           </archive>
         </configuration>
@@ -85,7 +85,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>com.helospark.FakeSsh.App</mainClass>
+              <mainClass>com.helospark.FakeSsh.FakeSshApplication</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>

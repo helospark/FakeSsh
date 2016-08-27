@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import com.helospark.FakeSsh.domain.SshString;
+import com.helospark.FakeSsh.util.LoggerSupport;
 
 /**
  * Ssh connection state the exchanges the identification strings.

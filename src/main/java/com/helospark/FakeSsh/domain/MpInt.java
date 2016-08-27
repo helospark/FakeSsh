@@ -5,7 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 
-import com.helospark.FakeSsh.ByteConverterUtils;
+import com.helospark.FakeSsh.util.ByteConverterUtils;
 
 public class MpInt {
 	private BigInteger integer;

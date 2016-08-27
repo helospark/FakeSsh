@@ -1,7 +1,6 @@
 package com.helospark.FakeSsh;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -10,6 +9,8 @@ import org.springframework.stereotype.Component;
 import com.helospark.FakeSsh.domain.AlgorithmNegotiationList;
 import com.helospark.FakeSsh.domain.NegotiatedAlgorithmList;
 import com.helospark.FakeSsh.domain.SshString;
+import com.helospark.FakeSsh.hostkey.ServerHostKeyAlgorithmProvider;
+import com.helospark.FakeSsh.kex.hash.SshHashFactory;
 
 /**
  * Ssh state that exchange supported algorithms with the client.
@@ -22,16 +23,18 @@ public class SshSupportedAlgorithmExchange implements SshState {
 	private NegotitatedAlgorithmExtractor negotitatedAlgorithmExtractor;
 	private SshHashFactory sshHashFactory;
 	private SshState next;
+	private ServerHostKeyAlgorithmProvider serverHostKeyAlgorithmProvider;
 
 	@Autowired
 	public SshSupportedAlgorithmExchange(SshDataExchangeService dataExchangeService, OurSupportedAlgorithmNegotiationListFactory ourSupportedAlgorithmNegotiationListFactory,
 			@Qualifier(StateNames.DIFFIE_HELLMAN_EXHCANGE_STATE) SshState diffieHellmanExchange, NegotitatedAlgorithmExtractor negotitatedAlgorithmExtractor,
-			SshHashFactory sshHashFactory) {
+			SshHashFactory sshHashFactory, ServerHostKeyAlgorithmProvider serverHostKeyAlgorithmProvider) {
 		this.dataExchangeService = dataExchangeService;
 		this.ourSupportedAlgorithmNegotiationListFactory = ourSupportedAlgorithmNegotiationListFactory;
 		this.next = diffieHellmanExchange;
 		this.negotitatedAlgorithmExtractor = negotitatedAlgorithmExtractor;
 		this.sshHashFactory = sshHashFactory;
+		this.serverHostKeyAlgorithmProvider = serverHostKeyAlgorithmProvider;
 	}
 
 	@Override
@@ -62,10 +65,11 @@ public class SshSupportedAlgorithmExchange implements SshState {
 		return remoteAlgorithmNegotiationList;
 	}
 
-	private void populateConnectionWithNegotiatedAlgorithms(SshConnection connection, AlgorithmNegotiationList localeAlgorithmNegotiationList, AlgorithmNegotiationList remoteAlgorithmNegotiationList) throws NoSuchAlgorithmException {
+	private void populateConnectionWithNegotiatedAlgorithms(SshConnection connection, AlgorithmNegotiationList localeAlgorithmNegotiationList, AlgorithmNegotiationList remoteAlgorithmNegotiationList) throws Exception {
 		NegotiatedAlgorithmList negotiatedAlgoritms = negotitatedAlgorithmExtractor.extract(localeAlgorithmNegotiationList, remoteAlgorithmNegotiationList);
 		connection.setNegotiatedAlgorithms(negotiatedAlgoritms);
 		connection.setHashFunction(sshHashFactory.createForKeyExchangeMethod(negotiatedAlgoritms.getKexAlgorithm()));
+		connection.setKeyProvider(serverHostKeyAlgorithmProvider.provideHostKeyAlgorithm(negotiatedAlgoritms.getServerKeyExchangeAlgorithm()));
 	}
 
 }

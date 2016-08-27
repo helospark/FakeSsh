@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import com.helospark.FakeSsh.domain.AlgorithmNegotiationList;
 import com.helospark.FakeSsh.domain.NegotiatedAlgorithmList;
 import com.helospark.FakeSsh.domain.SshNamedList;
+import com.helospark.FakeSsh.util.LoggerSupport;
 
 /**
  * Extract the algorithm used from the server's and client's algorithm exchange messages.
@@ -45,6 +46,7 @@ public class NegotitatedAlgorithmExtractor {
 		String compressionClientToServer = extractFirstMatch(serverList.compressionAlgorithmsClientToServer, clientList.compressionAlgorithmsClientToServer, false);
 		String compressionServerToClient = extractFirstMatch(serverList.compressionAlgorithmsServerToClient, clientList.compressionAlgorithmsServerToClient, false);
 		String kexAlgorithm = extractFirstMatch(serverList.kexAlgorithms, clientList.kexAlgorithms, true);
+		String serverKeyExchangeAlgorithm = extractFirstMatch(serverList.serverHostKeyAlgorithms, clientList.serverHostKeyAlgorithms, true);
 
 		return NegotiatedAlgorithmList.builder()
 				.withCompressionAlgorithmsClientToServer(compressionClientToServer)
@@ -56,13 +58,14 @@ public class NegotitatedAlgorithmExtractor {
 				.withLanguagesServerToClient(languageServerToClient)
 				.withMacAlgorithmsClientToServer(macClientToServer)
 				.withMacAlgorithmsServerToClient(macServerToClient)
+				.withServerKeyExchangeAlgorithm(serverKeyExchangeAlgorithm)
 				.build();
 	}
 
 	private String extractFirstMatch(SshNamedList serverList, SshNamedList clientList, boolean required) {
-		for (String clientElement : serverList.getElements()) {
-			if (clientList.getElements().indexOf(clientElement) != -1) {
-				return clientElement;
+		for (String serverElement : serverList.getElements()) {
+			if (clientList.getElements().indexOf(serverElement) != -1) {
+				return serverElement;
 			}
 		}
 		if (required) {

@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
-import com.helospark.FakeSsh.SshCipher;
+import com.helospark.FakeSsh.cipher.SshCipher;
 
 @Component
 public class PacketDecryptionService {

@@ -34,7 +34,7 @@ public class SshServiceRequest {
 		ByteArrayInputStream byteStream = new ByteArrayInputStream(data);
 		this.type = PacketType.fromValue((byte) byteStream.read());
 		if (this.type != PacketType.SSH_MSG_SERVICE_REQUEST) {
-			throw new RuntimeException("Unexpected packetType " + type);
+			throw new RuntimeException("Unexpected packet type (" + PacketType.SSH_MSG_SERVICE_REQUEST + " != " + type);
 		}
 		this.service = new String(new SshString(byteStream).serialize(), ApplicationConstants.SSH_CHARSET);
 	}

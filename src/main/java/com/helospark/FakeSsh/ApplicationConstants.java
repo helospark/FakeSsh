@@ -14,4 +14,5 @@ public class ApplicationConstants {
 	public static final int DEFAULT_PACKET_LENGTH_ALIGNMENT = 8;
 	public static final int MAX_PACKET_SIZE = 65000;
 	public static final int MAX_STRING_SIZE = 10000;
+	public static final int BIT_PER_BYTES = 8;
 }

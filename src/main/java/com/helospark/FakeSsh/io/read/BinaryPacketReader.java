@@ -8,9 +8,9 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 import com.helospark.FakeSsh.ApplicationConstants;
-import com.helospark.FakeSsh.ByteConverterUtils;
 import com.helospark.FakeSsh.ConnectionClosedException;
-import com.helospark.FakeSsh.SshCipher;
+import com.helospark.FakeSsh.cipher.SshCipher;
+import com.helospark.FakeSsh.util.ByteConverterUtils;
 
 /**
  * Reads a binary packet from stream.

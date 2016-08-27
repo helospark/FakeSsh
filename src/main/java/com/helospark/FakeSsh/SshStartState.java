@@ -3,6 +3,8 @@ package com.helospark.FakeSsh;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import com.helospark.FakeSsh.util.LoggerSupport;
+
 /**
  * Initial state for the SSH connection.
  * Handles exceptions and delegates to real state

@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.bouncycastle.util.Arrays;
 import org.springframework.stereotype.Component;
 
-import com.helospark.FakeSsh.SshMac;
+import com.helospark.FakeSsh.hmac.SshMac;
 
 /**
  * Separates the message and the HMAC.

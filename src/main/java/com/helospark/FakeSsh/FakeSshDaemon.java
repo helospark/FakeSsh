@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.helospark.FakeSsh.util.LoggerSupport;
+
 /**
  * Daemon to orchestrate the connections to the Fake SSH service. 
  * @author helospark

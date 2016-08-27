@@ -4,8 +4,8 @@ import java.math.BigInteger;
 import java.util.Arrays;
 
 import com.helospark.FakeSsh.ApplicationConstants;
-import com.helospark.FakeSsh.ByteConverterUtils;
 import com.helospark.FakeSsh.PacketType;
+import com.helospark.FakeSsh.util.ByteConverterUtils;
 
 public class DhGexInit {
 	private PacketType type;
@@ -18,7 +18,7 @@ public class DhGexInit {
 	public void deserialize(byte[] data) {
 		type = PacketType.fromValue(data[0]);
 		if (type != PacketType.SSH_MSG_KEX_DH_GEX_INIT) {
-			throw new RuntimeException("Unexpected packet");
+			throw new RuntimeException("Unexpected packet type (" + PacketType.SSH_MSG_KEX_DH_GEX_INIT + " != " + type);
 		}
 		int size = ByteConverterUtils.byteArrayToInt(data, 1);
 		int startIndex = ApplicationConstants.BYTE_SIZE + ApplicationConstants.INTEGER_LENGTH_IN_BYTES;

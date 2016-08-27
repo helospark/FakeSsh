@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
-import com.helospark.FakeSsh.SshMac;
+import com.helospark.FakeSsh.hmac.SshMac;
 
 /**
  * Check whether the received packet came with the correct mac bytes.
