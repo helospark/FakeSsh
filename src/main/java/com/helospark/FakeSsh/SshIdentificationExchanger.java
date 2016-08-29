@@ -3,10 +3,10 @@ package com.helospark.FakeSsh;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import com.helospark.FakeSsh.domain.SshString;
+import com.helospark.FakeSsh.io.SshDataExchangeService;
 import com.helospark.FakeSsh.util.LoggerSupport;
 
 /**
@@ -14,33 +14,27 @@ import com.helospark.FakeSsh.util.LoggerSupport;
  * @author helospark
  */
 @Component(StateNames.IDENTIFICATION_EXCHANGE_STATE)
-public class SshIdentificationExchanger implements SshState {
+public class SshIdentificationExchanger {
 	private static final String LOCALE_IDENTIFICATION_MESSAGE = "SSH-2.0-OpenSSH_6.6.1p1\r\n";
 	private SshDataExchangeService dataExchangeService;
 	private LoggerSupport loggerSupport;
-	private SshState next;
 
 	@Autowired
-	public SshIdentificationExchanger(SshDataExchangeService dataExchangeService, LoggerSupport loggerSupport, @Qualifier(StateNames.SUPPORTED_ALGORITHM_EXCHANGE_STATE) SshState sshSupportedAlgorithmExchange) {
+	public SshIdentificationExchanger(SshDataExchangeService dataExchangeService, LoggerSupport loggerSupport) {
 		this.dataExchangeService = dataExchangeService;
-		this.next = sshSupportedAlgorithmExchange;
 		this.loggerSupport = loggerSupport;
 	}
 
-	@Override
-	public void enterState(SshConnection connection) {
+	public void exchangeIdentification(SshConnection connection) {
 		try {
-			dataExchangeService.sendString(connection, LOCALE_IDENTIFICATION_MESSAGE);
 			String remoteIdentification = dataExchangeService.readStringUntilDelimiter(connection, '\n');
+			dataExchangeService.sendString(connection, LOCALE_IDENTIFICATION_MESSAGE);
 
 			connection.setRemoteIdentificationMessage(new SshString(clearNewlineCharacters(remoteIdentification)));
 			connection.setLocaleIdentificationMessage(new SshString(clearNewlineCharacters(LOCALE_IDENTIFICATION_MESSAGE)));
 
 			logIdentification(connection);
 
-			next.enterState(connection);
-		} catch (ConnectionClosedException e) {
-			return;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

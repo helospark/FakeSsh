@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import com.helospark.FakeSsh.domain.DhGexInit;
@@ -18,6 +17,7 @@ import com.helospark.FakeSsh.domain.MpInt;
 import com.helospark.FakeSsh.domain.SshString;
 import com.helospark.FakeSsh.hostkey.ServerHostKeyAlgorithm;
 import com.helospark.FakeSsh.hostkey.dsa.DssSignatureService;
+import com.helospark.FakeSsh.io.SshDataExchangeService;
 import com.helospark.FakeSsh.kex.DiffieHellmanExchangeHashCalculator;
 import com.helospark.FakeSsh.kex.DiffieHellmanKeyCalculatorService;
 import com.helospark.FakeSsh.kex.MacAndCipherPopulator;
@@ -28,7 +28,6 @@ import com.helospark.FakeSsh.util.LoggerSupport;
 public class DiffieHellmanExchangeState implements SshState {
 	private SshDataExchangeService dataExchangeService;
 	private SafePrimeProvider safePrimeProvider;
-	private SshServiceRequestService next;
 	private LoggerSupport loggerSupport;
 	private MacAndCipherPopulator macAndCipherPopulator;
 	private DiffieHellmanKeyCalculatorService diffieHellmanKeyCalculatorService;
@@ -36,12 +35,10 @@ public class DiffieHellmanExchangeState implements SshState {
 
 	@Autowired
 	public DiffieHellmanExchangeState(SshDataExchangeService dataExchangeService, SafePrimeProvider safePrimeProvider,
-			DssSignatureService dssSignatureService, @Qualifier(StateNames.SERVICE_REQUEST_STATE) SshServiceRequestService next,
-			LoggerSupport loggerSupport, DiffieHellmanKeyCalculatorService diffieHellmanKeyCalculatorService,
+			DssSignatureService dssSignatureService, LoggerSupport loggerSupport, DiffieHellmanKeyCalculatorService diffieHellmanKeyCalculatorService,
 			MacAndCipherPopulator macAndCipherPopulator, DiffieHellmanExchangeHashCalculator diffieHellmanExchangeHashCalculator) {
 		this.dataExchangeService = dataExchangeService;
 		this.safePrimeProvider = safePrimeProvider;
-		this.next = next;
 		this.loggerSupport = loggerSupport;
 		this.macAndCipherPopulator = macAndCipherPopulator;
 		this.diffieHellmanKeyCalculatorService = diffieHellmanKeyCalculatorService;
@@ -49,9 +46,9 @@ public class DiffieHellmanExchangeState implements SshState {
 	}
 
 	@Override
-	public void enterState(SshConnection connection) {
+	public StateMachineResult enterState(SshConnection connection, byte[] previousPacket) {
 		try {
-			DhKeySize dhKeySize = readDhKeySize(connection);
+			DhKeySize dhKeySize = readDhKeySize(previousPacket);
 			GeneratedPrime prime = safePrimeProvider.providePrime(dhKeySize.getMinimumLength(), dhKeySize.getPreferredLength(), dhKeySize.getMaximumLength());
 			DhGexResponse dhGexResponse = createDhGexResponse(prime);
 			sendSafePrime(connection, dhGexResponse);
@@ -69,9 +66,7 @@ public class DiffieHellmanExchangeState implements SshState {
 
 			logDiffieHellmanData(dhGexInit, diffieHellmanKey);
 
-			next.enterState(connection);
-		} catch (ConnectionClosedException e) {
-			return;
+			return StateMachineResult.SUCCESS;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -118,9 +113,8 @@ public class DiffieHellmanExchangeState implements SshState {
 		return new DhGexInit(packet);
 	}
 
-	private DhKeySize readDhKeySize(SshConnection connection) throws IOException {
-		byte[] gexRequestMessage = dataExchangeService.readPacket(connection);
-		return new DhKeySize(gexRequestMessage);
+	private DhKeySize readDhKeySize(byte[] previousPacket) throws IOException {
+		return new DhKeySize(previousPacket);
 	}
 
 	private void sendSafePrime(SshConnection connection, DhGexResponse dhGexResponse) throws IOException {

@@ -1,10 +1,12 @@
-package com.helospark.FakeSsh;
+package com.helospark.FakeSsh.io;
 
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.helospark.FakeSsh.PacketType;
+import com.helospark.FakeSsh.SshConnection;
 import com.helospark.FakeSsh.io.read.SshBinaryDataReaderService;
 import com.helospark.FakeSsh.io.read.StringReaderService;
 import com.helospark.FakeSsh.io.write.SshBinaryPacketSenderService;
@@ -36,6 +38,7 @@ public class SshDataExchangeService {
 	}
 
 	public void sendPacket(SshConnection connection, byte[] bytesToSend) throws IOException {
+		System.out.println(PacketType.fromValue(bytesToSend[0]));
 		sshBinaryPacketSenderService.sendPacket(connection, bytesToSend);
 	}
 

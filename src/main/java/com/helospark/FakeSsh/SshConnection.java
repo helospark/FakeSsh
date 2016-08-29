@@ -8,6 +8,7 @@ import com.helospark.FakeSsh.domain.NegotiatedAlgorithmList;
 import com.helospark.FakeSsh.domain.SshString;
 import com.helospark.FakeSsh.hmac.SshMac;
 import com.helospark.FakeSsh.hostkey.ServerHostKeyAlgorithm;
+import com.helospark.FakeSsh.io.ReadWriteSocketConnection;
 import com.helospark.FakeSsh.kex.hash.SshHash;
 
 /**

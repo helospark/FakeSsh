@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import com.helospark.FakeSsh.domain.SshServiceAccept;
 import com.helospark.FakeSsh.domain.SshServiceRequest;
 import com.helospark.FakeSsh.domain.SshString;
+import com.helospark.FakeSsh.io.SshDataExchangeService;
 
 /**
  * Ssh state that handles service requests.
@@ -18,28 +19,19 @@ import com.helospark.FakeSsh.domain.SshString;
 public class SshServiceRequestService implements SshState {
 	private static final String SUPPORTED_SERVICE = "ssh-userauth";
 	private SshDataExchangeService dataExchangeService;
-	private UserAuthHandler userAuthHandler;
-	private SshState authenticationState;
 
 	@Autowired
-	public SshServiceRequestService(UserAuthHandler userAuthHandler, SshDataExchangeService dataExchangeService) {
-		this.userAuthHandler = userAuthHandler;
+	public SshServiceRequestService(SshDataExchangeService dataExchangeService) {
 		this.dataExchangeService = dataExchangeService;
 	}
 
 	@Override
-	public void enterState(SshConnection connection) {
+	public StateMachineResult enterState(SshConnection connection, byte[] previousPacket) {
 		try {
 			@SuppressWarnings("unused")
-			SshServiceRequest sshServiceRequest = readServiceRequest(connection);
+			SshServiceRequest sshServiceRequest = readServiceRequest(previousPacket);
 			sendSupportedUserAuth(connection);
-			while (true) {
-				if (userAuthHandler.wasAuthRequestSuccesful(connection)) {
-					authenticationState.enterState(connection);
-				}
-			}
-		} catch (ConnectionClosedException e) {
-			return;
+			return StateMachineResult.SUCCESS;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -51,9 +43,8 @@ public class SshServiceRequestService implements SshState {
 		dataExchangeService.sendPacket(connection, sshServiceAccept.serialize());
 	}
 
-	private SshServiceRequest readServiceRequest(SshConnection connection) throws IOException {
-		byte[] serviceRequest = dataExchangeService.readPacket(connection);
-		SshServiceRequest sshServiceRequest = new SshServiceRequest(serviceRequest);
+	private SshServiceRequest readServiceRequest(byte[] previousPacket) throws IOException {
+		SshServiceRequest sshServiceRequest = new SshServiceRequest(previousPacket);
 		return sshServiceRequest;
 	}
 

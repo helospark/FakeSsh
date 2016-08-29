@@ -1,30 +1,31 @@
-package com.helospark.FakeSsh;
+package com.helospark.FakeSsh.io;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+
+import com.helospark.FakeSsh.io.read.NoBlockingOnBufferedDataPushBackInputStream;
 
 /**
  * Socket connection that can be read and written to.
  * @author helospark
  */
 public class ReadWriteSocketConnection {
-	private InputStream inputStream;
+	private NoBlockingOnBufferedDataPushBackInputStream inputStream;
 	private OutputStream outputStream;
 	private Socket socket;
 
 	public ReadWriteSocketConnection(Socket socket) throws IOException {
-		inputStream = socket.getInputStream();
+		inputStream = new NoBlockingOnBufferedDataPushBackInputStream(socket.getInputStream(), 2000);
 		outputStream = socket.getOutputStream();
 		this.socket = socket;
 	}
 
-	public InputStream getInputStream() {
+	public NoBlockingOnBufferedDataPushBackInputStream getInputStream() {
 		return inputStream;
 	}
 
-	public void setInputStream(InputStream inputStream) {
+	public void setInputStream(NoBlockingOnBufferedDataPushBackInputStream inputStream) {
 		this.inputStream = inputStream;
 	}
 

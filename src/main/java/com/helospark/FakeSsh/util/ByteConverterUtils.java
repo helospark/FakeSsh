@@ -1,5 +1,7 @@
 package com.helospark.FakeSsh.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import com.helospark.FakeSsh.ApplicationConstants;
@@ -38,5 +40,11 @@ public class ByteConverterUtils {
 		byte[] fourByteNumber = new byte[ApplicationConstants.INTEGER_LENGTH_IN_BYTES];
 		System.arraycopy(number, startIndex, fourByteNumber, 0, ApplicationConstants.INTEGER_LENGTH_IN_BYTES);
 		return ByteBuffer.wrap(fourByteNumber).getInt();
+	}
+
+	public static int readNextInt(ByteArrayInputStream byteStream) throws IOException {
+		byte[] data = new byte[4];
+		byteStream.read(data);
+		return ByteConverterUtils.byteArrayToInt(data);
 	}
 }

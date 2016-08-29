@@ -5,6 +5,8 @@ import java.net.Socket;
 
 import org.springframework.stereotype.Component;
 
+import com.helospark.FakeSsh.io.ReadWriteSocketConnection;
+
 /**
  * Builds the Ssh connection.
  * @author helospark

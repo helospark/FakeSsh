@@ -10,6 +10,6 @@ public interface SshState {
 	 * Enter this state.
 	 * @param connection that enters this state
 	 */
-	public void enterState(SshConnection connection);
+	public StateMachineResult enterState(SshConnection connection, byte[] previousPackage);
 
 }

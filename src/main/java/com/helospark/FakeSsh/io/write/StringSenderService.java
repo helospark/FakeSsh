@@ -6,8 +6,8 @@ import java.io.IOException;
 
 import org.springframework.stereotype.Component;
 
-import com.helospark.FakeSsh.ReadWriteSocketConnection;
 import com.helospark.FakeSsh.SshConnection;
+import com.helospark.FakeSsh.io.ReadWriteSocketConnection;
 
 /**
  * Sends plain strings to the given connection.

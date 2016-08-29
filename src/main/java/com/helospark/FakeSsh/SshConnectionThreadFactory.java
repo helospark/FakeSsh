@@ -1,7 +1,6 @@
 package com.helospark.FakeSsh;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -10,15 +9,15 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class SshConnectionThreadFactory {
-	private SshStartState sshStartState;
+	private StateMachineHandler stateMachineHandler;
 
 	@Autowired
-	public SshConnectionThreadFactory(@Qualifier(StateNames.START_STATE) SshStartState startState) {
-		this.sshStartState = startState;
+	public SshConnectionThreadFactory(StateMachineHandler stateMachineHandler) {
+		this.stateMachineHandler = stateMachineHandler;
 	}
 
 	public Thread createSshConnectionThread(SshConnection sshConnection) {
-		FakeSshConnectionRunnable fakeSshConnectionRunnable = new FakeSshConnectionRunnable(sshStartState, sshConnection);
+		FakeSshConnectionRunnable fakeSshConnectionRunnable = new FakeSshConnectionRunnable(stateMachineHandler, sshConnection);
 		return new Thread(fakeSshConnectionRunnable);
 	}
 }

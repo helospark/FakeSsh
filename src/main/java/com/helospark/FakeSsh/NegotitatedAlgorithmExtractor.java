@@ -48,7 +48,7 @@ public class NegotitatedAlgorithmExtractor {
 		String kexAlgorithm = extractFirstMatch(serverList.kexAlgorithms, clientList.kexAlgorithms, true);
 		String serverKeyExchangeAlgorithm = extractFirstMatch(serverList.serverHostKeyAlgorithms, clientList.serverHostKeyAlgorithms, true);
 
-		return NegotiatedAlgorithmList.builder()
+		NegotiatedAlgorithmList result = NegotiatedAlgorithmList.builder()
 				.withCompressionAlgorithmsClientToServer(compressionClientToServer)
 				.withCompressionAlgorithmsServerToClient(compressionServerToClient)
 				.withEncryptionAlgorithmsClientToServer(clientToServerEncryption)
@@ -60,12 +60,14 @@ public class NegotitatedAlgorithmExtractor {
 				.withMacAlgorithmsServerToClient(macServerToClient)
 				.withServerKeyExchangeAlgorithm(serverKeyExchangeAlgorithm)
 				.build();
+		loggerSupport.logDebugString(result.toString());
+		return result;
 	}
 
 	private String extractFirstMatch(SshNamedList serverList, SshNamedList clientList, boolean required) {
-		for (String serverElement : serverList.getElements()) {
-			if (clientList.getElements().indexOf(serverElement) != -1) {
-				return serverElement;
+		for (String clientElement : clientList.getElements()) {
+			if (serverList.getElements().indexOf(clientElement) != -1) {
+				return clientElement;
 			}
 		}
 		if (required) {
