@@ -13,8 +13,8 @@ public abstract class AbstractJavaInterfaceBasedCipherFactory implements CipherF
 	protected SshCipher createJavaInterfaceBasedCipher(String cipherAlgorithm, String algorithm, byte[] key, byte[] iv) {
 		try {
 			assertKeySizeIsLessThanMaximum(cipherAlgorithm, key.length);
-			Cipher encryptCipher = createEncryptionCipher(cipherAlgorithm, algorithm, Cipher.ENCRYPT_MODE, key, iv);
-			Cipher decryptCipher = createEncryptionCipher(cipherAlgorithm, algorithm, Cipher.DECRYPT_MODE, key, iv);
+			Cipher encryptCipher = createCipher(cipherAlgorithm, algorithm, Cipher.ENCRYPT_MODE, key, iv);
+			Cipher decryptCipher = createCipher(cipherAlgorithm, algorithm, Cipher.DECRYPT_MODE, key, iv);
 			return new JavaInterfaceBasedCipher(encryptCipher, decryptCipher);
 		} catch (Exception e) {
 			throw new RuntimeException("Unable to create cipher", e);
@@ -27,7 +27,7 @@ public abstract class AbstractJavaInterfaceBasedCipherFactory implements CipherF
 		}
 	}
 
-	public Cipher createEncryptionCipher(String name, String algorithm, int mode, byte[] key, byte[] iv) throws Exception {
+	public Cipher createCipher(String name, String algorithm, int mode, byte[] key, byte[] iv) throws Exception {
 		Cipher encryptCipher = Cipher.getInstance(name);
 		SecretKey keyValue = new SecretKeySpec(key, algorithm);
 		AlgorithmParameterSpec IVspec = new IvParameterSpec(iv);

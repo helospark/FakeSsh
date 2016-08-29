@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 import com.helospark.FakeSsh.SshConnection;
 import com.helospark.FakeSsh.cipher.SshCipher;
 import com.helospark.FakeSsh.cipher.SshCipherProvider;
+import com.helospark.FakeSsh.compression.SshCompression;
+import com.helospark.FakeSsh.compression.SshCompressionProvider;
 import com.helospark.FakeSsh.domain.NegotiatedAlgorithmList;
 import com.helospark.FakeSsh.hmac.SshMac;
 import com.helospark.FakeSsh.hmac.SshMacProvider;
@@ -20,24 +22,28 @@ import com.helospark.FakeSsh.util.LoggerSupport;
  * @author helospark
  */
 @Component
-public class MacAndCipherPopulator {
+public class NegotiatedAlgorithmPopulator {
 	private DiffieHellmanHashService diffieHellmanHashService;
 	private SshCipherProvider sshCipherProvider;
 	private SshMacProvider sshMacProvider;
+	private SshCompressionProvider sshCompressionProvider;
 	private LoggerSupport loggerSupport;
 
 	@Autowired
-	public MacAndCipherPopulator(DiffieHellmanHashService diffieHellmanHashService, SshCipherProvider sshCipherProvider, SshMacProvider sshMacProvider, LoggerSupport loggerSupport) {
+	public NegotiatedAlgorithmPopulator(DiffieHellmanHashService diffieHellmanHashService, SshCipherProvider sshCipherProvider,
+			SshMacProvider sshMacProvider, SshCompressionProvider sshCompressionProvider, LoggerSupport loggerSupport) {
 		this.diffieHellmanHashService = diffieHellmanHashService;
 		this.sshCipherProvider = sshCipherProvider;
 		this.sshMacProvider = sshMacProvider;
 		this.loggerSupport = loggerSupport;
+		this.sshCompressionProvider = sshCompressionProvider;
 	}
 
 	public void populateMacAndCipherOnConnection(SshConnection connection) throws IOException, NoSuchAlgorithmException {
 		NegotiatedAlgorithmList negotiatedAlgorithms = connection.getNegotiatedAlgoritms();
 		populateCipher(connection, negotiatedAlgorithms);
 		populateMac(connection, negotiatedAlgorithms);
+		populateCompression(connection, negotiatedAlgorithms);
 	}
 
 	private void populateMac(SshConnection connection, NegotiatedAlgorithmList negotiatedAlgorithms) throws IOException, NoSuchAlgorithmException {
@@ -82,4 +88,19 @@ public class MacAndCipherPopulator {
 		return sshCipherProvider.createCipher(algorithmName, cipherKey, initializationVector);
 	}
 
+	private void populateCompression(SshConnection connection, NegotiatedAlgorithmList negotiatedAlgorithms) {
+		populateClientToServerCompression(connection, negotiatedAlgorithms);
+		populateServerToClientCompression(connection, negotiatedAlgorithms);
+
+	}
+
+	private void populateClientToServerCompression(SshConnection connection, NegotiatedAlgorithmList negotiatedAlgorithms) {
+		SshCompression compressionAlgorithm = sshCompressionProvider.provideCompressionAlgorithm(negotiatedAlgorithms.getCompressionAlgorithmsClientToServer());
+		connection.setClientToServerCompression(compressionAlgorithm);
+	}
+
+	private void populateServerToClientCompression(SshConnection connection, NegotiatedAlgorithmList negotiatedAlgorithms) {
+		SshCompression compressionAlgorithm = sshCompressionProvider.provideCompressionAlgorithm(negotiatedAlgorithms.getCompressionAlgorithmsServerToClient());
+		connection.setServerToClientCompression(compressionAlgorithm);
+	}
 }

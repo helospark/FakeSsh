@@ -12,6 +12,7 @@ public class Aes128CtrCipherFactory extends AbstractJavaInterfaceBasedCipherFact
 	private static final String CIPHER_IDENTIFIER = "aes128-ctr";
 	private static final String JAVA_ALGORITHM_NAME = "AES";
 	private static final String JAVA_CIPHER_TYPE = "AES/CTR/NoPadding";
+
 	@Override
 	public SshCipher createCipher(byte[] key, byte[] iv) {
 		return super.createJavaInterfaceBasedCipher(JAVA_CIPHER_TYPE, JAVA_ALGORITHM_NAME, key, iv);

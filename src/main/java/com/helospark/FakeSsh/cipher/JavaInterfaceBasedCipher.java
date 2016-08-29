@@ -9,6 +9,7 @@ import javax.crypto.Cipher;
 public class JavaInterfaceBasedCipher implements SshCipher {
 	private Cipher encryptCipher;
 	private Cipher decryptCipher;
+	byte[] key, iv;
 
 	/**
 	 * Constructor.
@@ -31,7 +32,11 @@ public class JavaInterfaceBasedCipher implements SshCipher {
 			throw new RuntimeException("Data is not multiple of block size");
 		}
 		synchronized (encryptCipher) {
-			return encryptCipher.update(data);
+			try {
+				return encryptCipher.update(data);
+			} catch (Exception e) {
+				throw new RuntimeException("Unable to encrypt", e);
+			}
 		}
 	}
 
@@ -43,7 +48,11 @@ public class JavaInterfaceBasedCipher implements SshCipher {
 	@Override
 	public byte[] decrypt(byte[] data) {
 		synchronized (decryptCipher) {
-			return decryptCipher.update(data);
+			try {
+				return decryptCipher.update(data);
+			} catch (Exception e) {
+				throw new RuntimeException("Unable to decypher", e);
+			}
 		}
 	}
 
@@ -51,5 +60,4 @@ public class JavaInterfaceBasedCipher implements SshCipher {
 	public int getBlockSize() {
 		return encryptCipher.getBlockSize();
 	}
-
 }

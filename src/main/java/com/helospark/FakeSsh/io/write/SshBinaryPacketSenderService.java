@@ -13,7 +13,7 @@ import com.helospark.FakeSsh.SshConnection;
  * @author helospark
  */
 @Component
-public class SshBinaryPacketSenderService {
+public class SshBinaryPacketSenderService implements BinaryPacketSenderService {
 	private NonEncryptedPacketBuilder nonEncryptedPacketBuilder;
 	private PacketEncryptionService packetEncryptionService;
 	private HmacCalculator mmacCalculator;
@@ -25,6 +25,10 @@ public class SshBinaryPacketSenderService {
 		this.mmacCalculator = mmacCalculator;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.helospark.FakeSsh.io.write.BinaryPacketSenderService#sendPacket(com.helospark.FakeSsh.SshConnection, byte[])
+	 */
+	@Override
 	public void sendPacket(SshConnection connection, byte[] bytesToSend) throws IOException {
 		byte[] nonEncryptedPacket = nonEncryptedPacketBuilder.createNonEncryptedPacket(bytesToSend, connection.getServerToClientCipher());
 		byte[] encryptedPacket = packetEncryptionService.encryptPacket(nonEncryptedPacket, connection.getServerToClientCipher());

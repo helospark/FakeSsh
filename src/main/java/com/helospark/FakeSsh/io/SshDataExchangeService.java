@@ -3,13 +3,14 @@ package com.helospark.FakeSsh.io;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import com.helospark.FakeSsh.PacketType;
 import com.helospark.FakeSsh.SshConnection;
-import com.helospark.FakeSsh.io.read.SshBinaryDataReaderService;
+import com.helospark.FakeSsh.io.read.BinaryPacketReaderService;
 import com.helospark.FakeSsh.io.read.StringReaderService;
-import com.helospark.FakeSsh.io.write.SshBinaryPacketSenderService;
+import com.helospark.FakeSsh.io.write.BinaryPacketSenderService;
 import com.helospark.FakeSsh.io.write.StringSenderService;
 
 /**
@@ -19,14 +20,17 @@ import com.helospark.FakeSsh.io.write.StringSenderService;
  */
 @Component
 public class SshDataExchangeService {
-	private SshBinaryPacketSenderService sshBinaryPacketSenderService;
+	private BinaryPacketSenderService sshBinaryPacketSenderService;
 	private StringSenderService stringSenderService;
 
-	private SshBinaryDataReaderService sshBinaryDataReaderService;
+	private BinaryPacketReaderService sshBinaryDataReaderService;
 	private StringReaderService stringReaderService;
 
 	@Autowired
-	public SshDataExchangeService(SshBinaryPacketSenderService sshBinaryPacketSenderService, StringSenderService stringSenderService, SshBinaryDataReaderService sshBinaryDataReaderService, StringReaderService stringReaderService) {
+	public SshDataExchangeService(@Qualifier("loggingBinaryPackerSenderServiceProxy") BinaryPacketSenderService sshBinaryPacketSenderService,
+			@Qualifier("loggingBinaryPackerReaderServiceProxy") BinaryPacketReaderService sshBinaryDataReaderService,
+			StringReaderService stringReaderService,
+			StringSenderService stringSenderService) {
 		this.sshBinaryPacketSenderService = sshBinaryPacketSenderService;
 		this.stringSenderService = stringSenderService;
 		this.sshBinaryDataReaderService = sshBinaryDataReaderService;
@@ -38,7 +42,6 @@ public class SshDataExchangeService {
 	}
 
 	public void sendPacket(SshConnection connection, byte[] bytesToSend) throws IOException {
-		System.out.println(PacketType.fromValue(bytesToSend[0]));
 		sshBinaryPacketSenderService.sendPacket(connection, bytesToSend);
 	}
 

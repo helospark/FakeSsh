@@ -20,7 +20,7 @@ import com.helospark.FakeSsh.hostkey.dsa.DssSignatureService;
 import com.helospark.FakeSsh.io.SshDataExchangeService;
 import com.helospark.FakeSsh.kex.DiffieHellmanExchangeHashCalculator;
 import com.helospark.FakeSsh.kex.DiffieHellmanKeyCalculatorService;
-import com.helospark.FakeSsh.kex.MacAndCipherPopulator;
+import com.helospark.FakeSsh.kex.NegotiatedAlgorithmPopulator;
 import com.helospark.FakeSsh.kex.SafePrimeProvider;
 import com.helospark.FakeSsh.util.LoggerSupport;
 
@@ -29,18 +29,18 @@ public class DiffieHellmanExchangeState implements SshState {
 	private SshDataExchangeService dataExchangeService;
 	private SafePrimeProvider safePrimeProvider;
 	private LoggerSupport loggerSupport;
-	private MacAndCipherPopulator macAndCipherPopulator;
+	private NegotiatedAlgorithmPopulator negotiatedAlgorithmPopulator;
 	private DiffieHellmanKeyCalculatorService diffieHellmanKeyCalculatorService;
 	private DiffieHellmanExchangeHashCalculator diffieHellmanExchangeHashCalculator;
 
 	@Autowired
 	public DiffieHellmanExchangeState(SshDataExchangeService dataExchangeService, SafePrimeProvider safePrimeProvider,
 			DssSignatureService dssSignatureService, LoggerSupport loggerSupport, DiffieHellmanKeyCalculatorService diffieHellmanKeyCalculatorService,
-			MacAndCipherPopulator macAndCipherPopulator, DiffieHellmanExchangeHashCalculator diffieHellmanExchangeHashCalculator) {
+			NegotiatedAlgorithmPopulator negotiatedAlgorithmPopulator, DiffieHellmanExchangeHashCalculator diffieHellmanExchangeHashCalculator) {
 		this.dataExchangeService = dataExchangeService;
 		this.safePrimeProvider = safePrimeProvider;
 		this.loggerSupport = loggerSupport;
-		this.macAndCipherPopulator = macAndCipherPopulator;
+		this.negotiatedAlgorithmPopulator = negotiatedAlgorithmPopulator;
 		this.diffieHellmanKeyCalculatorService = diffieHellmanKeyCalculatorService;
 		this.diffieHellmanExchangeHashCalculator = diffieHellmanExchangeHashCalculator;
 	}
@@ -75,7 +75,7 @@ public class DiffieHellmanExchangeState implements SshState {
 	private void populateConnectionWithKexResult(SshConnection connection, DiffieHellmanKey diffieHellmanKey, byte[] hash) throws IOException, NoSuchAlgorithmException {
 		connection.setKey(diffieHellmanKey.getK());
 		connection.setHash(hash);
-		macAndCipherPopulator.populateMacAndCipherOnConnection(connection);
+		negotiatedAlgorithmPopulator.populateMacAndCipherOnConnection(connection);
 	}
 
 	private void logDiffieHellmanData(DhGexInit dhGexInit, DiffieHellmanKey diffieHellmanKey) {

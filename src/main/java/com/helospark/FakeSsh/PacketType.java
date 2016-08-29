@@ -8,6 +8,7 @@ import java.util.Arrays;
  * @author helospark
  */
 public enum PacketType {
+	UNKNOWN((byte) 0),
 	SSH_MSG_DISCONNECT((byte) 1),
 	SSH_MSG_IGNORE((byte) 2),
 	SSH_MSG_UNIMPLEMENTED((byte) 3),

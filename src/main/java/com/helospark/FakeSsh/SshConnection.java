@@ -3,6 +3,7 @@ package com.helospark.FakeSsh;
 import java.util.Optional;
 
 import com.helospark.FakeSsh.cipher.SshCipher;
+import com.helospark.FakeSsh.compression.SshCompression;
 import com.helospark.FakeSsh.domain.MpInt;
 import com.helospark.FakeSsh.domain.NegotiatedAlgorithmList;
 import com.helospark.FakeSsh.domain.SshString;
@@ -32,6 +33,8 @@ public class SshConnection {
 	private Optional<SshCipher> serverToClientCipher = Optional.empty();
 	private Optional<SshMac> clientToServerMac = Optional.empty();
 	private Optional<SshMac> serverToClientMac = Optional.empty();
+	private Optional<SshCompression> clientToServerCompression = Optional.empty();
+	private Optional<SshCompression> serverToClientCompression = Optional.empty();
 	private ServerHostKeyAlgorithm serverHostKeyAlgorithm;
 	private int numberOfSentPackeges = 0;
 	private int numberOfReceivedPackages = 0;
@@ -139,6 +142,22 @@ public class SshConnection {
 
 	public Optional<SshMac> getClientToServerMac() {
 		return clientToServerMac;
+	}
+
+	public Optional<SshCompression> getClientToServerCompression() {
+		return clientToServerCompression;
+	}
+
+	public void setClientToServerCompression(SshCompression clientToServerCompression) {
+		this.clientToServerCompression = Optional.ofNullable(clientToServerCompression);
+	}
+
+	public Optional<SshCompression> getServerToClientCompression() {
+		return serverToClientCompression;
+	}
+
+	public void setServerToClientCompression(SshCompression serverToClientCompression) {
+		this.serverToClientCompression = Optional.ofNullable(serverToClientCompression);
 	}
 
 	public void setClientToServerMac(SshMac clientToServerMac) {

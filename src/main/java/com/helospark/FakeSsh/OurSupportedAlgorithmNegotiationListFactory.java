@@ -1,12 +1,12 @@
 package com.helospark.FakeSsh;
 
-import java.util.Arrays;
 import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.helospark.FakeSsh.cipher.SshCipherProvider;
+import com.helospark.FakeSsh.compression.SshCompressionProvider;
 import com.helospark.FakeSsh.domain.AlgorithmNegotiationList;
 import com.helospark.FakeSsh.domain.SshNamedList;
 import com.helospark.FakeSsh.hmac.SshMacProvider;
@@ -23,15 +23,17 @@ public class OurSupportedAlgorithmNegotiationListFactory {
 	private ServerHostKeyAlgorithmProvider serverHostKeyAlgorithmProvider;
 	private SshCipherProvider cipherProvider;
 	private SshMacProvider sshMacProvider;
+	private SshCompressionProvider sshCompressionProvider;
 
 	@Autowired
 	public OurSupportedAlgorithmNegotiationListFactory(RandomNumberGenerator randomNumberGenerator,
 			ServerHostKeyAlgorithmProvider serverHostKeyAlgorithmProvider, SshCipherProvider cipherProvider,
-			SshMacProvider sshMacProvider) {
+			SshMacProvider sshMacProvider, SshCompressionProvider sshCompressionProvider) {
 		this.randomNumberGenerator = randomNumberGenerator;
 		this.serverHostKeyAlgorithmProvider = serverHostKeyAlgorithmProvider;
 		this.cipherProvider = cipherProvider;
 		this.sshMacProvider = sshMacProvider;
+		this.sshCompressionProvider = sshCompressionProvider;
 	}
 
 	public AlgorithmNegotiationList createAlgorithmNegotiationList() {
@@ -46,8 +48,8 @@ public class OurSupportedAlgorithmNegotiationListFactory {
 		algorithmNegotiationList.encryptionAlgorithmsServerToClient = new SshNamedList(cipherProvider.getAvailableAlgorithmNames());
 		algorithmNegotiationList.macAlgorithmsClientToServer = new SshNamedList(sshMacProvider.getSupportedAlgorithms());
 		algorithmNegotiationList.macAlgorithmsServerToClient = new SshNamedList(sshMacProvider.getSupportedAlgorithms());
-		algorithmNegotiationList.compressionAlgorithmsClientToServer = new SshNamedList(Arrays.asList("none"));
-		algorithmNegotiationList.compressionAlgorithmsServerToClient = new SshNamedList(Arrays.asList("none"));
+		algorithmNegotiationList.compressionAlgorithmsClientToServer = new SshNamedList(sshCompressionProvider.provideSupportedAlgorithms());
+		algorithmNegotiationList.compressionAlgorithmsServerToClient = new SshNamedList(sshCompressionProvider.provideSupportedAlgorithms());
 		algorithmNegotiationList.languagesClientToServer = new SshNamedList(Collections.emptyList());
 		algorithmNegotiationList.languagesServerToClient = new SshNamedList(Collections.emptyList());
 		return algorithmNegotiationList;

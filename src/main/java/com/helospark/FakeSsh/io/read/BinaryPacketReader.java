@@ -5,11 +5,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 
+import org.bouncycastle.util.Arrays;
 import org.springframework.stereotype.Component;
 
 import com.helospark.FakeSsh.ApplicationConstants;
 import com.helospark.FakeSsh.ConnectionClosedException;
 import com.helospark.FakeSsh.cipher.SshCipher;
+import com.helospark.FakeSsh.hmac.SshMac;
 import com.helospark.FakeSsh.util.ByteConverterUtils;
 
 /**
@@ -19,73 +21,75 @@ import com.helospark.FakeSsh.util.ByteConverterUtils;
 @Component
 public class BinaryPacketReader {
 
-	public byte[] readPacket(Optional<SshCipher> cipher, InputStream inputStream) throws IOException {
+	/**
+	 * Reads a packet.
+	 * @param cipher the used cipher
+	 * @param mac the used mac
+	 * @param inputStream to read data from
+	 * @return read decrypted packet
+	 * @throws IOException
+	 */
+	public byte[] readPacket(Optional<SshCipher> cipher, Optional<SshMac> mac, InputStream inputStream) throws IOException {
+		byte[] firstBlock = readFirstBlock(inputStream, cipher);
+		byte[] decryptedFirstBlock = decryptData(cipher, firstBlock);
+
+		byte[] remainingData = readRemainingData(inputStream, decryptedFirstBlock);
+		byte[] decryptedRemainingData = decryptData(cipher, remainingData);
+
+		byte[] macBytes = readMac(inputStream, mac);
+
+		return reconstuctNonEncryptedPacket(decryptedFirstBlock, decryptedRemainingData, macBytes);
+	}
+
+	private byte[] readRemainingData(InputStream inputStream, byte[] decryptedFirstBlock) throws IOException {
+		int messageSize = ByteConverterUtils.byteArrayToInt(decryptedFirstBlock);
+		assertMessageTooLarge(messageSize);
+		return readDataWithSize(inputStream, messageSize + 4 - decryptedFirstBlock.length);
+	}
+
+	private byte[] readMac(InputStream inputStream, Optional<SshMac> mac) throws IOException {
+		int macLength = mac.map(m -> m.getMacLength()).orElse(0);
+		return readDataWithSize(inputStream, macLength);
+	}
+
+	private byte[] readFirstBlock(InputStream inputStream, Optional<SshCipher> cipher) throws IOException {
+		int firstBlockSize = cipher.map(c -> c.getBlockSize()).orElse(4);
+		return readDataWithSize(inputStream, firstBlockSize);
+	}
+
+	private byte[] reconstuctNonEncryptedPacket(byte[] firstBlock, byte[] remainingData, byte[] mac) throws IOException {
+		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+		byteStream.write(firstBlock);
+		byteStream.write(remainingData);
+		byteStream.write(mac);
+		return byteStream.toByteArray();
+	}
+
+	private void assertMessageTooLarge(int messageSize) {
+		if (messageSize > ApplicationConstants.MAX_PACKET_SIZE) {
+			throw new RuntimeException("Too large packet");
+		}
+	}
+
+	private byte[] decryptData(Optional<SshCipher> cipher, byte[] data) {
+		byte[] decryptedData;
 		if (cipher.isPresent()) {
-			return readEncryptedData(inputStream);
+			decryptedData = cipher.get().decrypt(data);
 		} else {
-			return readNonEncryptedData(inputStream);
+			decryptedData = data;
 		}
+		return decryptedData;
 	}
 
-	/**
-	 * Based on the RFC, when the data is encrypted all data to one direction
-	 * can be considered part of the same packet.
-	 * @param inputStream to read from
-	 * @return read data
-	 */
-	private byte[] readEncryptedData(InputStream inputStream) throws IOException {
-		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-		byte[] buffer = new byte[1000];
-		do {
-			int readBytes = inputStream.read(buffer);
-			if (readBytes == -1) {
-				throw new ConnectionClosedException();
-			}
-			byteStream.write(buffer, 0, readBytes);
-		} while (inputStream.available() > 0 && byteStream.size() < ApplicationConstants.MAX_PACKET_SIZE);
-		if (byteStream.size() > ApplicationConstants.MAX_PACKET_SIZE) {
-			throw new RuntimeException("Too large packet");
+	private byte[] readDataWithSize(InputStream inputStream, int messageSizeToRead) throws IOException {
+		if (messageSizeToRead == 0) {
+			return new byte[0];
 		}
-		return byteStream.toByteArray();
-	}
-
-	/**
-	 * When data is not encrypted, read the number of bytes from the beginning and use
-	 * that to determine where the packet will end. If done the same way as an encrypted
-	 * packet, sometimes multiple packets may be read with one call.
-	 * @param inputStream to read from
-	 * @return read data
-	 */
-	private byte[] readNonEncryptedData(InputStream inputStream) throws IOException {
-		byte[] packetSizeBytes = readPacketSize(inputStream);
-		int packetSize = convertPacketSizeToInt(packetSizeBytes);
-		if (packetSize > ApplicationConstants.MAX_PACKET_SIZE) {
-			throw new RuntimeException("Too large packet");
+		byte[] readData = new byte[messageSizeToRead];
+		int readResult = inputStream.read(readData);
+		if (readResult == -1) {
+			throw new ConnectionClosedException();
 		}
-		byte[] packet = readPacket(inputStream, packetSize);
-		return reconstructOriginalPacket(packetSizeBytes, packet);
-	}
-
-	private byte[] readPacketSize(InputStream inputStream) throws IOException {
-		byte[] packetSizeBytes = new byte[4];
-		inputStream.read(packetSizeBytes);
-		return packetSizeBytes;
-	}
-
-	private int convertPacketSizeToInt(byte[] packetSizeBytes) {
-		return ByteConverterUtils.byteArrayToInt(packetSizeBytes);
-	}
-
-	private byte[] readPacket(InputStream inputStream, int numberOfBytes) throws IOException {
-		byte[] packet = new byte[numberOfBytes];
-		inputStream.read(packet);
-		return packet;
-	}
-
-	private byte[] reconstructOriginalPacket(byte[] packetSizeBytes, byte[] packet) throws IOException {
-		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-		byteStream.write(packetSizeBytes);
-		byteStream.write(packet);
-		return byteStream.toByteArray();
+		return Arrays.copyOfRange(readData, 0, readResult);
 	}
 }
