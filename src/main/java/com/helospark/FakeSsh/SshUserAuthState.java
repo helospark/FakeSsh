@@ -12,6 +12,10 @@ import com.helospark.FakeSsh.domain.SshUserAuthFailure;
 import com.helospark.FakeSsh.domain.SshUserauthRequest;
 import com.helospark.FakeSsh.io.SshDataExchangeService;
 
+/**
+ * State for user authentication.
+ * @author helospark
+ */
 @Component
 public class SshUserAuthState implements SshState {
 	private SshDataExchangeService dataExchangeService;
@@ -62,7 +66,7 @@ public class SshUserAuthState implements SshState {
 	}
 
 	private void sendAuthenticationSuccesfulMessage(SshConnection connection) throws IOException {
-		dataExchangeService.sendPacket(connection, PacketType.SSH_MSG_USERAUTH_SUCCESS);
+		dataExchangeService.sendPacketWithoutAnyPayload(connection, PacketType.SSH_MSG_USERAUTH_SUCCESS);
 	}
 
 }

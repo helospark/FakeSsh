@@ -6,6 +6,10 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * Provides the created {@link SshCompression} by name and supported compression names.
+ * @author helospark
+ */
 @Component
 public class SshCompressionProvider {
 	private List<SshCompressionFactory> compressionFactories;

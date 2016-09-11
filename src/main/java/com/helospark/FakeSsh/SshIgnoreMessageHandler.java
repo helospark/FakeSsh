@@ -2,6 +2,10 @@ package com.helospark.FakeSsh;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Handle the SSH_MSG_IGNORE messages.
+ * @author helospark
+ */
 @Component
 public class SshIgnoreMessageHandler implements SshCommonState {
 

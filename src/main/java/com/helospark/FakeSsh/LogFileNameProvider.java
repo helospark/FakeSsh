@@ -6,6 +6,10 @@ import java.util.Locale;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+/**
+ * Provides the log file name.
+ * @author helospark
+ */
 @Component
 public class LogFileNameProvider {
 	private String logPath;

@@ -13,18 +13,18 @@ import org.testng.annotations.Test;
 
 import com.helospark.FakeSsh.SshConnection;
 import com.helospark.FakeSsh.domain.MpInt;
-import com.helospark.FakeSsh.kex.hash.DiffieHellmanHashService;
+import com.helospark.FakeSsh.kex.hash.SshKeyHashGeneratorService;
 import com.helospark.FakeSsh.kex.hash.SshHash;
 
 public class DiffieHellmanHashServiceTest {
 	@Mock
 	private SshHash hashFunction;
-	private DiffieHellmanHashService underTest;
+	private SshKeyHashGeneratorService underTest;
 
 	@BeforeMethod
 	public void setUp() {
 		initMocks(this);
-		underTest = new DiffieHellmanHashService();
+		underTest = new SshKeyHashGeneratorService();
 	}
 
 	@Test

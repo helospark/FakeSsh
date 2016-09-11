@@ -6,6 +6,10 @@ import org.springframework.stereotype.Component;
 import com.helospark.FakeSsh.domain.DebugMessage;
 import com.helospark.FakeSsh.util.LoggerSupport;
 
+/**
+ * Handle the SSH_MSG_DEBUG messages.
+ * @author helospark
+ */
 @Component
 public class SshDebugMessageHandler implements SshCommonState {
 	private LoggerSupport loggerSupport;

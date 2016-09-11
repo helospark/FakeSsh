@@ -34,7 +34,7 @@ public class PasswordAuthenticationHandler implements AuthenticationHandler {
 		SshPasswordUserAuthRequest sshPasswordUserAuthRequest = new SshPasswordUserAuthRequest(rawData);
 		System.out.println(sshPasswordUserAuthRequest.getUsername() + " " + sshPasswordUserAuthRequest.getPassword());
 		synchronizedFileLogger.logToFile(sshPasswordUserAuthRequest.getUsername(), sshPasswordUserAuthRequest.getPassword(), getInetAddress(connection));
-		return "123".equals(sshPasswordUserAuthRequest.getPassword());
+		return "asd".equals(sshPasswordUserAuthRequest.getPassword());
 	}
 
 	private InetAddress getInetAddress(final SshConnection connection) {

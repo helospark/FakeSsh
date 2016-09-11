@@ -31,7 +31,8 @@ public class ChannelRequestMessageHandler implements ChannelMessageHandler {
 		Optional<ChannelRequestHandler> handler = channelRequestHandlers.stream()
 				.filter(h -> h.canHandle(request.getRequestType()))
 				.findFirst();
-		boolean result = handler.map(h -> h.handleMessage(packet)).orElse(false);
+		Channel channel = connection.getChannel(request.getRecipientChannel()).get();
+		boolean result = handler.map(h -> h.handleMessage(channel, packet)).orElse(false);
 		if (request.isWantReply()) {
 			ChannelRequestResult channelRequestResult = new ChannelRequestResult();
 			channelRequestResult.setType(result ? PacketType.SSH_MSG_CHANNEL_SUCCESS : PacketType.SSH_MSG_CHANNEL_FAILURE);

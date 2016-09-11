@@ -5,6 +5,10 @@ import org.springframework.stereotype.Component;
 import com.helospark.FakeSsh.domain.DisconnectRequest;
 import com.helospark.FakeSsh.util.LoggerSupport;
 
+/**
+ * Handle the SSH_MSG_DISCONNECT messages.
+ * @author helospark
+ */
 @Component
 public class SshDisconnectMessageHandler implements SshCommonState {
 	private LoggerSupport loggerSupport;

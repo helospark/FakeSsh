@@ -1,7 +1,10 @@
 package com.helospark.FakeSsh;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
+import com.helospark.FakeSsh.channel.Channel;
 import com.helospark.FakeSsh.cipher.SshCipher;
 import com.helospark.FakeSsh.compression.SshCompression;
 import com.helospark.FakeSsh.domain.MpInt;
@@ -39,6 +42,7 @@ public class SshConnection {
 	private int numberOfSentPackeges = 0;
 	private int numberOfReceivedPackages = 0;
 	private boolean connectionClosed = false;
+	private Map<Integer, Channel> channels = new HashMap<>();
 
 	public ReadWriteSocketConnection getConnection() {
 		return connection;
@@ -205,4 +209,17 @@ public class SshConnection {
 				.map(connection -> connection.getSocket().getInetAddress().getHostAddress())
 				.orElse("N/A");
 	}
+
+	public Optional<Channel> getChannel(int index) {
+		return Optional.ofNullable(channels).map(channelMap -> channelMap.get(index));
+	}
+
+	public Map<Integer, Channel> getChannels() {
+		return channels;
+	}
+
+	public void addChannel(Channel channel) {
+		channels.put(channel.getChannelId(), channel);
+	}
+
 }

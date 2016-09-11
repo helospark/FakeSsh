@@ -3,12 +3,10 @@ package com.helospark.FakeSsh.io.read;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.bouncycastle.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.helospark.FakeSsh.SshConnection;
-import com.helospark.FakeSsh.util.ByteConverterUtils;
 
 /**
  * Reads a binary packet from the given connection.
@@ -17,52 +15,49 @@ import com.helospark.FakeSsh.util.ByteConverterUtils;
  */
 @Component
 public class SshBinaryPacketReaderService implements BinaryPacketReaderService {
-	private BinaryPacketReader binaryPacketReader;
-	private PacketMacValidator packetMacValidator;
+	private DecryptingPacketReader decryptingPacketReader;
+	private MacValidator macValidator;
 	private PacketPayloadExtractor packetPayloadExtractor;
-	private MacExtractorService macExtractorService;
+	private MacReader macReader;
 
 	@Autowired
-	public SshBinaryPacketReaderService(BinaryPacketReader binaryPacketReader, PacketMacValidator packetMacValidator,
+	public SshBinaryPacketReaderService(DecryptingPacketReader decryptingPacketReader, MacValidator macValidator,
 			PacketPayloadExtractor packetPayloadExtractor,
-			MacExtractorService macExtractorService) {
-		this.binaryPacketReader = binaryPacketReader;
-		this.packetMacValidator = packetMacValidator;
+			MacReader macReader) {
+		this.decryptingPacketReader = decryptingPacketReader;
+		this.macValidator = macValidator;
 		this.packetPayloadExtractor = packetPayloadExtractor;
-		this.macExtractorService = macExtractorService;
+		this.macReader = macReader;
 	}
 
 	@Override
 	public byte[] readPacket(SshConnection connection) throws IOException {
-		byte[] packet = readFullDecryptedPacket(connection);
-		return processPacket(connection, packet);
-	}
-
-	private byte[] processPacket(SshConnection connection, byte[] packet) throws IOException {
-		byte[] dataWithoutMac = macExtractorService.extractPacketWithoutMac(packet, connection.getClientToServerMac());
-		validateMac(connection, packet, dataWithoutMac);
-		byte[] result = packetPayloadExtractor.extractResult(dataWithoutMac);
+		byte[] packet = readDecryptedPacket(connection);
+		byte[] mac = readMac(connection);
+		assertMacValid(connection, packet, mac);
+		byte[] result = packetPayloadExtractor.extractResult(packet);
 		connection.incrementNumberOfReceivedPackages();
 		return result;
 	}
 
-	private void validateMac(SshConnection connection, byte[] packet, byte[] decryptedPacket) throws IOException {
-		byte[] mac = macExtractorService.extractMac(connection.getClientToServerMac(), packet, decryptedPacket);
-		int size = ByteConverterUtils.byteArrayToInt(decryptedPacket);
-		byte[] correctedData = Arrays.copyOfRange(decryptedPacket, 0, size + 4);
-		if (!isMacValid(connection, correctedData, mac)) {
+	private void assertMacValid(SshConnection connection, byte[] decryptedPacket, byte[] mac) throws IOException {
+		if (!isMacValid(connection, decryptedPacket, mac)) {
 			throw new RuntimeException("MAC is not valid");
 		}
 	}
 
-	private byte[] readFullDecryptedPacket(SshConnection connection) throws IOException {
+	private byte[] readDecryptedPacket(SshConnection connection) throws IOException {
 		InputStream inputStream = connection.getConnection().getInputStream();
-		byte[] packet = binaryPacketReader.readPacket(connection.getClientToServerCipher(), connection.getClientToServerMac(), inputStream);
-		return packet;
+		return decryptingPacketReader.readPacket(inputStream, connection.getClientToServerCipher());
+	}
+
+	private byte[] readMac(SshConnection connection) throws IOException {
+		InputStream inputStream = connection.getConnection().getInputStream();
+		return macReader.readMac(inputStream, connection.getClientToServerMac());
 	}
 
 	private boolean isMacValid(SshConnection connection, byte[] decryptedPacket, byte[] mac) throws IOException {
-		return packetMacValidator.isMacValid(connection.getClientToServerMac(), decryptedPacket, mac, connection.getNumberOfReceivedPackages());
+		return macValidator.isMacValid(connection.getClientToServerMac(), decryptedPacket, mac, connection.getNumberOfReceivedPackages());
 	}
 
 }

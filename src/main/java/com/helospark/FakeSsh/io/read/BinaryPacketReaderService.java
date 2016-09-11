@@ -4,6 +4,11 @@ import java.io.IOException;
 
 import com.helospark.FakeSsh.SshConnection;
 
+/**
+ * Reads a packet from the given connection.
+ * Extracts payload, optionally decrypts, uncompresses and check MAC
+ * @author helospark
+ */
 public interface BinaryPacketReaderService {
 
 	/**

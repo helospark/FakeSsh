@@ -7,6 +7,10 @@ import com.helospark.FakeSsh.compression.SshCompression;
 import com.helospark.FakeSsh.compression.SshCompressionFactory;
 import com.helospark.FakeSsh.compression.implementation.NoneSshCompression;
 
+/**
+ * Factory to create {@link NoneSshCompressionFactory}.
+ * @author helospark
+ */
 @Component
 @Order(0)
 public class NoneSshCompressionFactory implements SshCompressionFactory {

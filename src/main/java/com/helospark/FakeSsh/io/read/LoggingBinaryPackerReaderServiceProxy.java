@@ -9,6 +9,10 @@ import com.helospark.FakeSsh.PacketType;
 import com.helospark.FakeSsh.SshConnection;
 import com.helospark.FakeSsh.util.LoggerSupport;
 
+/**
+ * Proxy around BinaryPacketReaderService to add logging.
+ * @author helospark
+ */
 @Component("loggingBinaryPackerReaderServiceProxy")
 public class LoggingBinaryPackerReaderServiceProxy implements BinaryPacketReaderService {
 	private BinaryPacketReaderService proxiedBinaryPacketReaderService;
@@ -22,18 +26,10 @@ public class LoggingBinaryPackerReaderServiceProxy implements BinaryPacketReader
 	@Override
 	public byte[] readPacket(SshConnection connection) throws IOException {
 		byte[] readPacket = proxiedBinaryPacketReaderService.readPacket(connection);
-		PacketType packetType = getPacketType(readPacket);
+		PacketType packetType = PacketType.fromValue(readPacket[0]);
 		loggerSupport.logDebugString("Received packet " + packetType);
 		loggerSupport.dumpByteArrayInHex(readPacket, "Decrypted packet payload");
 		return readPacket;
-	}
-
-	private PacketType getPacketType(byte[] readPacket) {
-		try {
-			return PacketType.fromValue(readPacket[0]);
-		} catch (RuntimeException e) {
-			return PacketType.UNKNOWN;
-		}
 	}
 
 }

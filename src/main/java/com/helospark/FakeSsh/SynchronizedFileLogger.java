@@ -10,6 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+/**
+ * Logs to a file in a synchronized manner.
+ * @author helospark
+ */
 @Component
 @Scope("prototype")
 public class SynchronizedFileLogger {

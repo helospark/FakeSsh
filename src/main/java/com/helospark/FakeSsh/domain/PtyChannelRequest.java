@@ -6,7 +6,7 @@ import java.io.IOException;
 import com.helospark.FakeSsh.util.ByteConverterUtils;
 
 public class PtyChannelRequest extends ChannelRequest {
-	private String environmentVariable;
+	private String terminalType;
 	private int terminalWidth;
 	private int terminalHeight;
 	private int terminalWidthInPixels;
@@ -21,7 +21,7 @@ public class PtyChannelRequest extends ChannelRequest {
 	public void deserialize(byte[] data) throws IOException {
 		ByteArrayInputStream byteStream = new ByteArrayInputStream(data);
 		super.deserialize(byteStream);
-		environmentVariable = new SshString(byteStream).getAsUtf8String();
+		terminalType = new SshString(byteStream).getAsUtf8String();
 		terminalWidth = ByteConverterUtils.readNextInt(byteStream);
 		terminalHeight = ByteConverterUtils.readNextInt(byteStream);
 		terminalWidthInPixels = ByteConverterUtils.readNextInt(byteStream);
@@ -29,8 +29,8 @@ public class PtyChannelRequest extends ChannelRequest {
 		modes = new SshString(byteStream).getAsUtf8String();
 	}
 
-	public String getEnvironmentVariable() {
-		return environmentVariable;
+	public String getTerminalType() {
+		return terminalType;
 	}
 
 	public int getTerminalWidth() {
@@ -55,7 +55,7 @@ public class PtyChannelRequest extends ChannelRequest {
 
 	@Override
 	public String toString() {
-		return "PtyChannelRequest [environmentVariable=" + environmentVariable + ", terminalWidth=" + terminalWidth + ", terminalHeight=" + terminalHeight + ", terminalWidthInPixels=" + terminalWidthInPixels + ", terminalHeightInPixels="
+		return "PtyChannelRequest [terminalType=" + terminalType + ", terminalWidth=" + terminalWidth + ", terminalHeight=" + terminalHeight + ", terminalWidthInPixels=" + terminalWidthInPixels + ", terminalHeightInPixels="
 				+ terminalHeightInPixels + ", modes=" + modes + "]";
 	}
 

@@ -16,7 +16,7 @@ import com.helospark.FakeSsh.kex.hash.SshHashFactory;
  * Ssh state that exchange supported algorithms with the client.
  * @author helospark
  */
-@Component(StateNames.SUPPORTED_ALGORITHM_EXCHANGE_STATE)
+@Component
 public class SshSupportedAlgorithmExchange implements SshState {
 	private SshDataExchangeService dataExchangeService;
 	private OurSupportedAlgorithmNegotiationListFactory ourSupportedAlgorithmNegotiationListFactory;

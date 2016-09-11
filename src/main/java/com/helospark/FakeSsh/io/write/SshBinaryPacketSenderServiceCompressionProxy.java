@@ -10,6 +10,10 @@ import org.springframework.stereotype.Component;
 import com.helospark.FakeSsh.SshConnection;
 import com.helospark.FakeSsh.compression.SshCompression;
 
+/**
+ * Proxy around BinaryPacketSenderService to compress the payload.
+ * @author helospark
+ */
 @Component("sshBinaryPacketSenderServiceCompressionProxy")
 public class SshBinaryPacketSenderServiceCompressionProxy implements BinaryPacketSenderService {
 	private BinaryPacketSenderService proxiedBinaryPacketSender;

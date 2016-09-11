@@ -9,6 +9,10 @@ import org.springframework.stereotype.Component;
 
 import com.helospark.FakeSsh.util.BufferedReaderFactory;
 
+/**
+ * Reads a private key file in PEM format and decodes to raw data.
+ * @author helospark
+ */
 @Component
 public class Base64PrivateKeyReader {
 	private static final String COMMENT_START_CHARACTERS = "--";

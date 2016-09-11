@@ -6,6 +6,10 @@ import org.springframework.stereotype.Component;
 import com.helospark.FakeSsh.hmac.AbstractMessageDigestBasedHmacFactory;
 import com.helospark.FakeSsh.hmac.SshMac;
 
+/**
+ * Factory to create HMAC for 'hmac-md5' type.
+ * @author helospark
+ */
 @Component
 @Order(3)
 public class Md5HmacFactory extends AbstractMessageDigestBasedHmacFactory {

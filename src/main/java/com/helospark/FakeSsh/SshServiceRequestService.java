@@ -15,7 +15,7 @@ import com.helospark.FakeSsh.io.SshDataExchangeService;
  * Ssh state that handles service requests.
  * @author helospark
  */
-@Component(StateNames.SERVICE_REQUEST_STATE)
+@Component
 public class SshServiceRequestService implements SshState {
 	private static final String SUPPORTED_SERVICE = "ssh-userauth";
 	private SshDataExchangeService dataExchangeService;

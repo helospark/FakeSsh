@@ -13,7 +13,7 @@ import com.helospark.FakeSsh.util.LoggerSupport;
  * Ssh connection state the exchanges the identification strings.
  * @author helospark
  */
-@Component(StateNames.IDENTIFICATION_EXCHANGE_STATE)
+@Component
 public class SshIdentificationExchanger {
 	private static final String LOCALE_IDENTIFICATION_MESSAGE = "SSH-2.0-OpenSSH_6.6.1p1\r\n";
 	private SshDataExchangeService dataExchangeService;

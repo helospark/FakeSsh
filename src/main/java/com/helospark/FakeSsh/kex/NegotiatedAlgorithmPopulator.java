@@ -14,7 +14,7 @@ import com.helospark.FakeSsh.compression.SshCompressionProvider;
 import com.helospark.FakeSsh.domain.NegotiatedAlgorithmList;
 import com.helospark.FakeSsh.hmac.SshMac;
 import com.helospark.FakeSsh.hmac.SshMacProvider;
-import com.helospark.FakeSsh.kex.hash.DiffieHellmanHashService;
+import com.helospark.FakeSsh.kex.hash.SshKeyHashGeneratorService;
 import com.helospark.FakeSsh.util.LoggerSupport;
 
 /**
@@ -23,16 +23,16 @@ import com.helospark.FakeSsh.util.LoggerSupport;
  */
 @Component
 public class NegotiatedAlgorithmPopulator {
-	private DiffieHellmanHashService diffieHellmanHashService;
+	private SshKeyHashGeneratorService sshKeyHashGeneratorService;
 	private SshCipherProvider sshCipherProvider;
 	private SshMacProvider sshMacProvider;
 	private SshCompressionProvider sshCompressionProvider;
 	private LoggerSupport loggerSupport;
 
 	@Autowired
-	public NegotiatedAlgorithmPopulator(DiffieHellmanHashService diffieHellmanHashService, SshCipherProvider sshCipherProvider,
+	public NegotiatedAlgorithmPopulator(SshKeyHashGeneratorService sshKeyHashGeneratorService, SshCipherProvider sshCipherProvider,
 			SshMacProvider sshMacProvider, SshCompressionProvider sshCompressionProvider, LoggerSupport loggerSupport) {
-		this.diffieHellmanHashService = diffieHellmanHashService;
+		this.sshKeyHashGeneratorService = sshKeyHashGeneratorService;
 		this.sshCipherProvider = sshCipherProvider;
 		this.sshMacProvider = sshMacProvider;
 		this.loggerSupport = loggerSupport;
@@ -49,8 +49,8 @@ public class NegotiatedAlgorithmPopulator {
 	private void populateMac(SshConnection connection, NegotiatedAlgorithmList negotiatedAlgorithms) throws IOException, NoSuchAlgorithmException {
 		String clientToServerMacAlgorithm = negotiatedAlgorithms.getMacAlgorithmsClientToServer();
 		String serverToClientMacAlgorithm = negotiatedAlgorithms.getMacAlgorithmsServerToClient();
-		byte[] integrityKeyClientToServer = diffieHellmanHashService.hash(connection, 'E', sshMacProvider.getKeyLength(clientToServerMacAlgorithm));
-		byte[] integrityKeyServerToClient = diffieHellmanHashService.hash(connection, 'F', sshMacProvider.getKeyLength(serverToClientMacAlgorithm));
+		byte[] integrityKeyClientToServer = sshKeyHashGeneratorService.hash(connection, 'E', sshMacProvider.getKeyLength(clientToServerMacAlgorithm));
+		byte[] integrityKeyServerToClient = sshKeyHashGeneratorService.hash(connection, 'F', sshMacProvider.getKeyLength(serverToClientMacAlgorithm));
 		SshMac clientToServerMac = sshMacProvider.createMac(clientToServerMacAlgorithm, integrityKeyClientToServer);
 		SshMac serverToClientMac = sshMacProvider.createMac(serverToClientMacAlgorithm, integrityKeyServerToClient);
 
@@ -79,8 +79,8 @@ public class NegotiatedAlgorithmPopulator {
 	}
 
 	private SshCipher initializeCipherCipher(SshConnection connection, String algorithmName, char ivHashChar, char keyHashChar) throws IOException {
-		byte[] initializationVector = diffieHellmanHashService.hash(connection, ivHashChar, sshCipherProvider.getIvSize(algorithmName));
-		byte[] cipherKey = diffieHellmanHashService.hash(connection, keyHashChar, sshCipherProvider.getKeySize(algorithmName));
+		byte[] initializationVector = sshKeyHashGeneratorService.hash(connection, ivHashChar, sshCipherProvider.getIvSize(algorithmName));
+		byte[] cipherKey = sshKeyHashGeneratorService.hash(connection, keyHashChar, sshCipherProvider.getKeySize(algorithmName));
 
 		loggerSupport.dumpByteArrayInHex(initializationVector, "Hash " + ivHashChar);
 		loggerSupport.dumpByteArrayInHex(cipherKey, "Hash " + keyHashChar);

@@ -20,8 +20,8 @@ import com.helospark.FakeSsh.domain.MpInt;
 import com.helospark.FakeSsh.domain.SshString;
 import com.helospark.FakeSsh.hostkey.Base64PrivateKeyReader;
 import com.helospark.FakeSsh.hostkey.ServerHostKeyAlgorithm;
-import com.helospark.FakeSsh.signiture.DsaParamsImpl;
-import com.helospark.FakeSsh.signiture.DsaPrivateKeyImpl;
+import com.helospark.FakeSsh.hostkey.dsa.domain.DsaParamsImpl;
+import com.helospark.FakeSsh.hostkey.dsa.domain.DsaPrivateKeyImpl;
 import com.helospark.FakeSsh.util.LoggerSupport;
 
 /**

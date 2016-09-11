@@ -16,10 +16,10 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.helospark.FakeSsh.domain.MpInt;
-import com.helospark.FakeSsh.domain.RsaPrivateKeyImpl;
 import com.helospark.FakeSsh.domain.SshString;
 import com.helospark.FakeSsh.hostkey.Base64PrivateKeyReader;
 import com.helospark.FakeSsh.hostkey.ServerHostKeyAlgorithm;
+import com.helospark.FakeSsh.hostkey.rsa.domain.RsaPrivateKeyImpl;
 import com.helospark.FakeSsh.util.LoggerSupport;
 
 /**

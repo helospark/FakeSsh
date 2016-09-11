@@ -49,7 +49,7 @@ public class SshDataExchangeService {
 		return sshBinaryDataReaderService.readPacket(connection);
 	}
 
-	public void sendPacket(SshConnection connection, PacketType packetType) throws IOException {
+	public void sendPacketWithoutAnyPayload(SshConnection connection, PacketType packetType) throws IOException {
 		sendPacket(connection, new byte[] { packetType.getValue() });
 	}
 

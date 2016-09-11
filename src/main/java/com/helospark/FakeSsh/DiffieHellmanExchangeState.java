@@ -18,31 +18,31 @@ import com.helospark.FakeSsh.domain.SshString;
 import com.helospark.FakeSsh.hostkey.ServerHostKeyAlgorithm;
 import com.helospark.FakeSsh.hostkey.dsa.DssSignatureService;
 import com.helospark.FakeSsh.io.SshDataExchangeService;
-import com.helospark.FakeSsh.kex.DiffieHellmanExchangeHashCalculator;
 import com.helospark.FakeSsh.kex.DiffieHellmanKeyCalculatorService;
 import com.helospark.FakeSsh.kex.NegotiatedAlgorithmPopulator;
 import com.helospark.FakeSsh.kex.SafePrimeProvider;
+import com.helospark.FakeSsh.kex.SshExchangeHashCalculator;
 import com.helospark.FakeSsh.util.LoggerSupport;
 
-@Component(StateNames.DIFFIE_HELLMAN_EXHCANGE_STATE)
+@Component
 public class DiffieHellmanExchangeState implements SshState {
 	private SshDataExchangeService dataExchangeService;
 	private SafePrimeProvider safePrimeProvider;
 	private LoggerSupport loggerSupport;
 	private NegotiatedAlgorithmPopulator negotiatedAlgorithmPopulator;
 	private DiffieHellmanKeyCalculatorService diffieHellmanKeyCalculatorService;
-	private DiffieHellmanExchangeHashCalculator diffieHellmanExchangeHashCalculator;
+	private SshExchangeHashCalculator sshExchangeHashCalculator;
 
 	@Autowired
 	public DiffieHellmanExchangeState(SshDataExchangeService dataExchangeService, SafePrimeProvider safePrimeProvider,
 			DssSignatureService dssSignatureService, LoggerSupport loggerSupport, DiffieHellmanKeyCalculatorService diffieHellmanKeyCalculatorService,
-			NegotiatedAlgorithmPopulator negotiatedAlgorithmPopulator, DiffieHellmanExchangeHashCalculator diffieHellmanExchangeHashCalculator) {
+			NegotiatedAlgorithmPopulator negotiatedAlgorithmPopulator, SshExchangeHashCalculator sshExchangeHashCalculator) {
 		this.dataExchangeService = dataExchangeService;
 		this.safePrimeProvider = safePrimeProvider;
 		this.loggerSupport = loggerSupport;
 		this.negotiatedAlgorithmPopulator = negotiatedAlgorithmPopulator;
 		this.diffieHellmanKeyCalculatorService = diffieHellmanKeyCalculatorService;
-		this.diffieHellmanExchangeHashCalculator = diffieHellmanExchangeHashCalculator;
+		this.sshExchangeHashCalculator = sshExchangeHashCalculator;
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class DiffieHellmanExchangeState implements SshState {
 
 			DiffieHellmanKey diffieHellmanKey = diffieHellmanKeyCalculatorService.calculateKey(prime, dhGexInit.getE());
 			SshString publicKey = connection.getKeyProvider().providePublicKey();
-			byte[] hash = diffieHellmanExchangeHashCalculator.calculateHash(connection, dhKeySize, dhGexResponse, dhGexInit, diffieHellmanKey, publicKey);
+			byte[] hash = sshExchangeHashCalculator.calculateHash(connection, dhKeySize, dhGexResponse, dhGexInit, diffieHellmanKey, publicKey);
 
 			sendDhGexReply(connection, diffieHellmanKey, hash);
 

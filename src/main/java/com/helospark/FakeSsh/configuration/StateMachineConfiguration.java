@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import com.helospark.FakeSsh.SshCommonState;
 import com.helospark.FakeSsh.SshIdentificationExchanger;
 import com.helospark.FakeSsh.SshState;
-import com.helospark.FakeSsh.StateMachineHandler;
+import com.helospark.FakeSsh.SshStateMachine;
 import com.helospark.FakeSsh.io.SshDataExchangeService;
 import com.helospark.FakeSsh.util.LoggerSupport;
 
@@ -29,8 +29,8 @@ public class StateMachineConfiguration {
 	private SshDataExchangeService dataExchangeService;
 
 	@Bean(name = "stateMachine")
-	public StateMachineHandler createStateMachine() {
-		return new StateMachineHandler(commonStates, states, identificationExchanger, loggerSupport, dataExchangeService);
+	public SshStateMachine createStateMachine() {
+		return new SshStateMachine(commonStates, states, identificationExchanger, loggerSupport, dataExchangeService);
 	}
 
 }

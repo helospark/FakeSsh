@@ -25,9 +25,6 @@ public class SshBinaryPacketSenderService implements BinaryPacketSenderService {
 		this.mmacCalculator = mmacCalculator;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.helospark.FakeSsh.io.write.BinaryPacketSenderService#sendPacket(com.helospark.FakeSsh.SshConnection, byte[])
-	 */
 	@Override
 	public void sendPacket(SshConnection connection, byte[] bytesToSend) throws IOException {
 		byte[] nonEncryptedPacket = nonEncryptedPacketBuilder.createNonEncryptedPacket(bytesToSend, connection.getServerToClientCipher());

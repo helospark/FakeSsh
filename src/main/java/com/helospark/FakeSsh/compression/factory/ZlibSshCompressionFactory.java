@@ -10,6 +10,13 @@ import com.jcraft.jzlib.Deflater;
 import com.jcraft.jzlib.Inflater;
 import com.jcraft.jzlib.JZlib;
 
+/**
+ * Factory to create {@link ZlibSshCompression}.
+ * Note: SSH defines partial flush as the algorithm to flush data between packeges, but
+ * it appears that it is not supported by the Deflate/Inflate present in the JDK.
+ * For this reason JZlib is used as a backend.
+ * @author helospark
+ */
 @Component
 @Order(1)
 public class ZlibSshCompressionFactory implements SshCompressionFactory {

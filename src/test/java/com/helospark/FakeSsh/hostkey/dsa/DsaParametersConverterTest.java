@@ -9,8 +9,8 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.helospark.FakeSsh.hostkey.dsa.DsaParametersConverter;
-import com.helospark.FakeSsh.signiture.DsaParamsImpl;
-import com.helospark.FakeSsh.signiture.DsaPrivateKeyImpl;
+import com.helospark.FakeSsh.hostkey.dsa.domain.DsaParamsImpl;
+import com.helospark.FakeSsh.hostkey.dsa.domain.DsaPrivateKeyImpl;
 
 public class DsaParametersConverterTest {
 	private DsaParametersConverter underTest;

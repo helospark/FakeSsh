@@ -7,6 +7,10 @@ import org.springframework.stereotype.Component;
 
 import com.helospark.FakeSsh.channel.ChannelMessageHandler;
 
+/**
+ * Handle channel related messages.
+ * @author helospark
+ */
 @Component
 public class SshChannelMessageHandlerState implements SshState {
 	private List<ChannelMessageHandler> channelMessageHandler;

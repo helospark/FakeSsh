@@ -9,15 +9,15 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class SshConnectionThreadFactory {
-	private StateMachineHandler stateMachineHandler;
+	private SshStateMachine sshStateMachine;
 
 	@Autowired
-	public SshConnectionThreadFactory(StateMachineHandler stateMachineHandler) {
-		this.stateMachineHandler = stateMachineHandler;
+	public SshConnectionThreadFactory(SshStateMachine sshStateMachine) {
+		this.sshStateMachine = sshStateMachine;
 	}
 
 	public Thread createSshConnectionThread(SshConnection sshConnection) {
-		FakeSshConnectionRunnable fakeSshConnectionRunnable = new FakeSshConnectionRunnable(stateMachineHandler, sshConnection);
+		FakeSshConnectionRunnable fakeSshConnectionRunnable = new FakeSshConnectionRunnable(sshStateMachine, sshConnection);
 		return new Thread(fakeSshConnectionRunnable);
 	}
 }

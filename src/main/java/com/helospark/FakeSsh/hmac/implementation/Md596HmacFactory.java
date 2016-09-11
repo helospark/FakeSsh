@@ -7,6 +7,10 @@ import com.helospark.FakeSsh.ApplicationConstants;
 import com.helospark.FakeSsh.hmac.AbstractMessageDigestBasedHmacFactory;
 import com.helospark.FakeSsh.hmac.SshMac;
 
+/**
+ * Factory to create HMAC for 'hmac-md5-96' type.
+ * @author helospark
+ */
 @Component
 @Order(4)
 public class Md596HmacFactory extends AbstractMessageDigestBasedHmacFactory {

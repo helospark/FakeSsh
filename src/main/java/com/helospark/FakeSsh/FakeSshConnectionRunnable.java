@@ -7,18 +7,18 @@ import java.io.IOException;
  * @author helospark
  */
 public class FakeSshConnectionRunnable implements Runnable {
-	private StateMachineHandler stateMachineHandler;
+	private SshStateMachine sshStateMachine;
 	private SshConnection sshConnection;
 
-	public FakeSshConnectionRunnable(StateMachineHandler stateMachineHandler, SshConnection sshConnection) {
-		this.stateMachineHandler = stateMachineHandler;
+	public FakeSshConnectionRunnable(SshStateMachine sshStateMachine, SshConnection sshConnection) {
+		this.sshStateMachine = sshStateMachine;
 		this.sshConnection = sshConnection;
 	}
 
 	@Override
 	public void run() {
 		try {
-			stateMachineHandler.handle(sshConnection);
+			sshStateMachine.handle(sshConnection);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

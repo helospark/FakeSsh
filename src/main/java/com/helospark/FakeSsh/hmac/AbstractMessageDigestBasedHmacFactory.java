@@ -2,6 +2,10 @@ package com.helospark.FakeSsh.hmac;
 
 import java.security.MessageDigest;
 
+/**
+ * Message digest based Hmac factory.
+ * @author helospark
+ */
 public abstract class AbstractMessageDigestBasedHmacFactory implements HmacFactory {
 
 	protected SshMac createMessageDigestBackedHMac(String algorithmName, int blockSize, int macSize, byte[] key) {

@@ -10,6 +10,10 @@ import com.helospark.FakeSsh.PacketType;
 import com.helospark.FakeSsh.SshConnection;
 import com.helospark.FakeSsh.util.LoggerSupport;
 
+/**
+ * Proxy around BinaryPacketSenderService to add logging.
+ * @author helospark
+ */
 @Component("loggingBinaryPackerSenderServiceProxy")
 public class LoggingBinaryPackerSenderServiceProxy implements BinaryPacketSenderService {
 	private BinaryPacketSenderService proxiedBinaryPacketSenderService;
