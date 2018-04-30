@@ -3,7 +3,7 @@ package com.helospark.FakeSsh.hostkey.dsa;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Component;
 
 /**
  * Hash function that uses SHA-1.

@@ -1,7 +1,7 @@
 package com.helospark.FakeSsh.cipher.implementation;
 
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Order;
+import com.helospark.lightdi.annotation.Component;
 
 import com.helospark.FakeSsh.cipher.AbstractJavaInterfaceBasedCipherFactory;
 import com.helospark.FakeSsh.cipher.SshCipher;

@@ -1,6 +1,6 @@
 package com.helospark.FakeSsh.channel.requesthandler;
 
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Component;
 
 import com.helospark.FakeSsh.domain.EnvChannelRequest;
 

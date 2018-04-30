@@ -5,7 +5,7 @@ import java.security.interfaces.DSAPrivateKey;
 import org.bouncycastle.crypto.params.DSAParameters;
 import org.bouncycastle.crypto.params.DSAPrivateKeyParameters;
 import org.bouncycastle.crypto.signers.DSASigner;
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Component;
 
 /**
  * Creates {@link DsaSigner} with DSA private key.

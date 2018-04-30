@@ -7,10 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Autowired;
+import com.helospark.lightdi.annotation.Qualifier;
+import com.helospark.lightdi.annotation.Value;
+import com.helospark.lightdi.annotation.Component;
 
 import com.helospark.FakeSsh.util.LoggerSupport;
 

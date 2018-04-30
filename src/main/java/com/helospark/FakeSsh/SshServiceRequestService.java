@@ -3,8 +3,8 @@ package com.helospark.FakeSsh;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Autowired;
+import com.helospark.lightdi.annotation.Component;
 
 import com.helospark.FakeSsh.domain.SshServiceAccept;
 import com.helospark.FakeSsh.domain.SshServiceRequest;

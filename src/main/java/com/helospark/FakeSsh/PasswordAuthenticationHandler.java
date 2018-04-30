@@ -3,8 +3,8 @@ package com.helospark.FakeSsh;
 import java.io.IOException;
 import java.net.InetAddress;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Autowired;
+import com.helospark.lightdi.annotation.Component;
 
 import com.helospark.FakeSsh.domain.SshPasswordUserAuthRequest;
 import com.helospark.FakeSsh.domain.SshUserauthRequest;

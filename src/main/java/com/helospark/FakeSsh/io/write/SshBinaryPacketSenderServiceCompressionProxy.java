@@ -3,9 +3,9 @@ package com.helospark.FakeSsh.io.write;
 import java.io.IOException;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Autowired;
+import com.helospark.lightdi.annotation.Qualifier;
+import com.helospark.lightdi.annotation.Component;
 
 import com.helospark.FakeSsh.SshConnection;
 import com.helospark.FakeSsh.compression.SshCompression;

@@ -3,7 +3,7 @@ package com.helospark.FakeSsh.kex.hash;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Component;
 
 /**
  * Creates hash for the KEX algorithm.

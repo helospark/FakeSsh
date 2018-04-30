@@ -3,8 +3,8 @@ package com.helospark.FakeSsh;
 import java.time.ZonedDateTime;
 import java.util.Locale;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Value;
+import com.helospark.lightdi.annotation.Component;
 
 @Component
 public class LogFileNameProvider {

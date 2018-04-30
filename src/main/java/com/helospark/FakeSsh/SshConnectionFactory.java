@@ -3,7 +3,7 @@ package com.helospark.FakeSsh;
 import java.io.IOException;
 import java.net.Socket;
 
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Component;
 
 import com.helospark.FakeSsh.io.ReadWriteSocketConnection;
 

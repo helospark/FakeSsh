@@ -2,8 +2,8 @@ package com.helospark.FakeSsh;
 
 import java.util.Collections;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Autowired;
+import com.helospark.lightdi.annotation.Component;
 
 import com.helospark.FakeSsh.cipher.SshCipherProvider;
 import com.helospark.FakeSsh.compression.SshCompressionProvider;

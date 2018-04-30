@@ -3,7 +3,7 @@ package com.helospark.FakeSsh.hostkey;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Component;
 
 /** 
  * Normalizes the length of a BigInteger to the given amount of bytes.

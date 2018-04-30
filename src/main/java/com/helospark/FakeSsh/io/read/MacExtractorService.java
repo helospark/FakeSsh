@@ -3,7 +3,7 @@ package com.helospark.FakeSsh.io.read;
 import java.util.Optional;
 
 import org.bouncycastle.util.Arrays;
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Component;
 
 import com.helospark.FakeSsh.hmac.SshMac;
 import com.helospark.FakeSsh.util.ByteConverterUtils;

@@ -1,6 +1,6 @@
 package com.helospark.FakeSsh;
 
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Component;
 
 import com.helospark.FakeSsh.domain.DisconnectRequest;
 import com.helospark.FakeSsh.util.LoggerSupport;

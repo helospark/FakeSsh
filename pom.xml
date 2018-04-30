@@ -4,7 +4,7 @@
 
   <groupId>com.helospark</groupId>
   <artifactId>FakeSsh</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.2-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>FakeSsh</name>
@@ -16,9 +16,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
-      <version>4.3.2.RELEASE</version>
+        <groupId>com.helospark</groupId>
+        <artifactId>lightdi</artifactId>
+        <version>0.0.2</version>
     </dependency>
 	<dependency>
 	    <groupId>org.bouncycastle</groupId>

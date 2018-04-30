@@ -2,35 +2,36 @@ package com.helospark.FakeSsh.configuration;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import com.helospark.FakeSsh.SshCommonState;
 import com.helospark.FakeSsh.SshIdentificationExchanger;
-import com.helospark.FakeSsh.SshState;
 import com.helospark.FakeSsh.StateMachineHandler;
 import com.helospark.FakeSsh.io.SshDataExchangeService;
 import com.helospark.FakeSsh.util.LoggerSupport;
+import com.helospark.lightdi.annotation.Bean;
+import com.helospark.lightdi.annotation.Configuration;
 
 @Configuration
 public class StateMachineConfiguration {
-	@Autowired
-	private List<SshCommonState> commonStates;
-	@Autowired
-	@Qualifier("sshStates")
-	private List<SshState> states;
-	@Autowired
-	private SshIdentificationExchanger identificationExchanger;
-	@Autowired
-	private LoggerSupport loggerSupport;
-	@Autowired
-	private SshDataExchangeService dataExchangeService;
+    private List<SshCommonState> commonStates;
+    private SshStatesProvider sshStatesProvider;
+    private SshIdentificationExchanger identificationExchanger;
+    private LoggerSupport loggerSupport;
+    private SshDataExchangeService dataExchangeService;
 
-	@Bean(name = "stateMachine")
-	public StateMachineHandler createStateMachine() {
-		return new StateMachineHandler(commonStates, states, identificationExchanger, loggerSupport, dataExchangeService);
-	}
+    // LightDi 0.0.3 will support qualified collections
+    public StateMachineConfiguration(List<SshCommonState> commonStates, SshStatesProvider sshStatesProvider,
+            SshIdentificationExchanger identificationExchanger,
+            LoggerSupport loggerSupport, SshDataExchangeService dataExchangeService) {
+        this.commonStates = commonStates;
+        this.sshStatesProvider = sshStatesProvider;
+        this.identificationExchanger = identificationExchanger;
+        this.loggerSupport = loggerSupport;
+        this.dataExchangeService = dataExchangeService;
+    }
+
+    @Bean(name = "stateMachine")
+    public StateMachineHandler createStateMachine() {
+        return new StateMachineHandler(commonStates, sshStatesProvider.sshStates(), identificationExchanger, loggerSupport, dataExchangeService);
+    }
 
 }

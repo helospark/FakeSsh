@@ -3,7 +3,7 @@ package com.helospark.FakeSsh.kex;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Component;
 
 import com.helospark.FakeSsh.SshConnection;
 import com.helospark.FakeSsh.domain.DhGexInit;

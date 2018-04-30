@@ -2,8 +2,8 @@ package com.helospark.FakeSsh.io.read;
 
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Qualifier;
+import com.helospark.lightdi.annotation.Component;
 
 import com.helospark.FakeSsh.PacketType;
 import com.helospark.FakeSsh.SshConnection;
