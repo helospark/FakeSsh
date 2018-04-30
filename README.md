@@ -7,7 +7,7 @@ I made it to investigate brute-force attack on SSH services.
 
 ## Depenencies
 
- - Spring for DI
+ - LightDi for DI
  - Bouncycastle for some cryptographic algorithms
  - Slf4j with logback for logging
  - TestNG, Mockito for testing
@@ -22,7 +22,7 @@ mvn clean install on the main folder
 ## Run
 
 Once you have the jar:
-java -jar FakeSsh-0.0.1-SNAPSHOT-jar-with-dependencies.jar
+java -jar FakeSsh-{version}-SNAPSHOT.jar
 
 ## Configuration
 
