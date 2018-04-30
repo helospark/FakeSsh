@@ -5,11 +5,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Component;
 
 /**
  * Builds {@link BufferedReader} from a file or filename.
@@ -19,8 +18,9 @@ import org.springframework.stereotype.Component;
 public class BufferedReaderFactory {
 
 	public BufferedReader createClasspathBufferedReader(String fileName) throws IOException {
-		Resource resource = new ClassPathResource(fileName);
-		return new BufferedReader(new InputStreamReader(resource.getInputStream()));
+		InputStream inputStream = this.getClass().getClassLoader()
+				.getResourceAsStream(fileName);
+		return new BufferedReader(new InputStreamReader(inputStream));
 	}
 
 	public BufferedReader createFromFile(File file) throws FileNotFoundException {

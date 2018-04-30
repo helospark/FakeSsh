@@ -2,23 +2,19 @@ package com.helospark.FakeSsh;
 
 import java.io.IOException;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import com.helospark.lightdi.LightDi;
+import com.helospark.lightdi.LightDiContext;
 
 /**
  * Entry point for the FakeSSH application.
  * @author helospark
  */
 public class FakeSshApplication {
-	private static ApplicationContext context;
+	private static LightDiContext context;
 
 	public static void main(String[] args) throws IOException {
-		initializeDIFramework();
+		context = LightDi.initContextByClass(FakeSshConfiguration.class);
 		FakeSshDaemon daemon = context.getBean(FakeSshDaemon.class);
 		daemon.run();
-	}
-
-	private static void initializeDIFramework() {
-		context = new ClassPathXmlApplicationContext("classpath:spring-context.xml");
 	}
 }

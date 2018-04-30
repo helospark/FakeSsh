@@ -5,15 +5,12 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.interfaces.RSAPrivateKey;
 
+import javax.annotation.PostConstruct;
+
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 
 import com.helospark.FakeSsh.domain.MpInt;
 import com.helospark.FakeSsh.domain.RsaPrivateKeyImpl;
@@ -21,6 +18,10 @@ import com.helospark.FakeSsh.domain.SshString;
 import com.helospark.FakeSsh.hostkey.Base64PrivateKeyReader;
 import com.helospark.FakeSsh.hostkey.ServerHostKeyAlgorithm;
 import com.helospark.FakeSsh.util.LoggerSupport;
+import com.helospark.lightdi.annotation.Autowired;
+import com.helospark.lightdi.annotation.Component;
+import com.helospark.lightdi.annotation.Order;
+import com.helospark.lightdi.annotation.Value;
 
 /**
  * RSA key algorithm.
@@ -28,7 +29,7 @@ import com.helospark.FakeSsh.util.LoggerSupport;
  */
 @Component
 @Order(0)
-public class RsaServerHostKeyAlgorithm implements ServerHostKeyAlgorithm, InitializingBean {
+public class RsaServerHostKeyAlgorithm implements ServerHostKeyAlgorithm {
 	private static final String RSA_NAME = "ssh-rsa";
 	private String privateKeyFileName;
 	private RsaSignatureService rsaSignerService;
@@ -47,7 +48,7 @@ public class RsaServerHostKeyAlgorithm implements ServerHostKeyAlgorithm, Initia
 		this.loggerSupport = loggerSupport;
 	}
 
-	@Override
+	@PostConstruct
 	public void afterPropertiesSet() throws Exception {
 		byte[] data = base64PrivateKeyReader.read(privateKeyFileName);
 		initializeFromData(data);

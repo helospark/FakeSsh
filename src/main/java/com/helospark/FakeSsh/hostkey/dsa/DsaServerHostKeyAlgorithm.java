@@ -6,15 +6,12 @@ import java.math.BigInteger;
 import java.security.interfaces.DSAParams;
 import java.security.interfaces.DSAPrivateKey;
 
+import javax.annotation.PostConstruct;
+
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 
 import com.helospark.FakeSsh.domain.MpInt;
 import com.helospark.FakeSsh.domain.SshString;
@@ -23,6 +20,10 @@ import com.helospark.FakeSsh.hostkey.ServerHostKeyAlgorithm;
 import com.helospark.FakeSsh.signiture.DsaParamsImpl;
 import com.helospark.FakeSsh.signiture.DsaPrivateKeyImpl;
 import com.helospark.FakeSsh.util.LoggerSupport;
+import com.helospark.lightdi.annotation.Autowired;
+import com.helospark.lightdi.annotation.Component;
+import com.helospark.lightdi.annotation.Order;
+import com.helospark.lightdi.annotation.Value;
 
 /**
  * Service to provides the server's DSA public and private keys.
@@ -30,7 +31,7 @@ import com.helospark.FakeSsh.util.LoggerSupport;
  */
 @Component
 @Order(1)
-public class DsaServerHostKeyAlgorithm implements ServerHostKeyAlgorithm, InitializingBean {
+public class DsaServerHostKeyAlgorithm implements ServerHostKeyAlgorithm {
 	private static final String SSH_DSS_NAME = "ssh-dss";
 	private String privateKeyName;
 	private Base64PrivateKeyReader base64PrivateKeyReader;
@@ -49,7 +50,7 @@ public class DsaServerHostKeyAlgorithm implements ServerHostKeyAlgorithm, Initia
 		this.dssSignatureService = dssSignatureService;
 	}
 
-	@Override
+	@PostConstruct
 	public void afterPropertiesSet() throws Exception {
 		byte[] data = base64PrivateKeyReader.read(privateKeyName);
 		initializeFromData(data);

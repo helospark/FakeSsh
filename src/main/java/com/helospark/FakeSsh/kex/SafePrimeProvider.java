@@ -3,18 +3,17 @@ package com.helospark.FakeSsh.kex;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import javax.annotation.PostConstruct;
 
 import com.helospark.FakeSsh.domain.GeneratedPrime;
 import com.helospark.FakeSsh.util.BufferedReaderFactory;
+import com.helospark.lightdi.annotation.Autowired;
+import com.helospark.lightdi.annotation.Component;
+import com.helospark.lightdi.annotation.Value;
 
 /**
  * Provides sage primes according to according to RFC 4419.
@@ -22,7 +21,7 @@ import com.helospark.FakeSsh.util.BufferedReaderFactory;
  * @author helospark
  */
 @Component
-public class SafePrimeProvider implements InitializingBean {
+public class SafePrimeProvider {
 	private static final char COMMENT_CHARACTER = '#';
 	private static final String PRIME_LINE_SEPARATOR = " ";
 	private static final int BIT_SIZE_INDEX = 4;
@@ -33,7 +32,6 @@ public class SafePrimeProvider implements InitializingBean {
 	private String fileName;
 	private List<GeneratedPrime> generatedPrimes = new ArrayList<>();
 	private BufferedReaderFactory bufferedReaderFactory;
-	private SecureRandom secureRandom;
 
 	/**
 	 * Constructor.
@@ -41,14 +39,12 @@ public class SafePrimeProvider implements InitializingBean {
 	 * @param bufferedReaderFactory to read the above file
 	 */
 	@Autowired
-	private SafePrimeProvider(@Value("${PRIME_DATABASE}") String fileName, BufferedReaderFactory bufferedReaderFactory,
-			SecureRandom secureRandom) {
+	public SafePrimeProvider(@Value("${PRIME_DATABASE}") String fileName, BufferedReaderFactory bufferedReaderFactory) {
 		this.fileName = fileName;
 		this.bufferedReaderFactory = bufferedReaderFactory;
-		this.secureRandom = secureRandom;
 	}
 
-	@Override
+	@PostConstruct
 	public void afterPropertiesSet() throws Exception {
 		BufferedReader fileInputStream = bufferedReaderFactory.createClasspathBufferedReader(fileName);
 		try {

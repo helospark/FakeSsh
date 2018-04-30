@@ -5,7 +5,7 @@ import static com.helospark.FakeSsh.ApplicationConstants.MINIMUM_PADDING_SIZE;
 
 import java.util.Optional;
 
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Component;
 
 import com.helospark.FakeSsh.cipher.SshCipher;
 

@@ -2,8 +2,8 @@ package com.helospark.FakeSsh.configuration;
 
 import java.security.SecureRandom;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import com.helospark.lightdi.annotation.Bean;
+import com.helospark.lightdi.annotation.Configuration;
 
 /**
  * Spring configuration for random numbers.

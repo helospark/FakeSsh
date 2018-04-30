@@ -3,9 +3,9 @@ package com.helospark.FakeSsh.configuration;
 import java.io.IOException;
 import java.net.ServerSocket;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import com.helospark.lightdi.annotation.Value;
+import com.helospark.lightdi.annotation.Bean;
+import com.helospark.lightdi.annotation.Configuration;
 
 @Configuration
 public class ServerSocketConfiguration {

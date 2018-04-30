@@ -5,9 +5,9 @@ import java.net.Socket;
 import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Autowired;
+import com.helospark.lightdi.annotation.Component;
+import com.helospark.lightdi.annotation.Value;
 
 /**
  * Service to check whether it is allowed for a SSH connection to be established.
@@ -15,10 +15,12 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ConnectionPermissionCheckingService {
-	private long numberOfConnectionAllowedFromSameIp;
+	// LightDi 0.0.3 will support long as well.
+	// I could write a custom converter, but 2 billion connection per IP should be enough
+	private int numberOfConnectionAllowedFromSameIp;
 
 	@Autowired
-	public ConnectionPermissionCheckingService(@Value("${MAX_NUMBER_OF_CONNECTION_FROM_SAME_IP}") long numberOfConnectionAllowedFromSameIp) {
+	public ConnectionPermissionCheckingService(@Value("${MAX_NUMBER_OF_CONNECTION_FROM_SAME_IP}") int numberOfConnectionAllowedFromSameIp) {
 		this.numberOfConnectionAllowedFromSameIp = numberOfConnectionAllowedFromSameIp;
 	}
 

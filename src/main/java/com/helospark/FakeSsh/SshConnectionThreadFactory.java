@@ -1,7 +1,7 @@
 package com.helospark.FakeSsh;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Autowired;
+import com.helospark.lightdi.annotation.Component;
 
 /**
  * Builds the thread for the SshConnection.

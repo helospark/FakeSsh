@@ -7,8 +7,8 @@ import java.security.interfaces.DSAPrivateKey;
 
 import org.bouncycastle.crypto.params.DSAParameters;
 import org.bouncycastle.crypto.signers.DSASigner;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Autowired;
+import com.helospark.lightdi.annotation.Component;
 
 import com.helospark.FakeSsh.domain.SshString;
 import com.helospark.FakeSsh.hostkey.BigIntegerBitLengthNormalizer;

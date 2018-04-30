@@ -2,7 +2,7 @@ package com.helospark.FakeSsh.io.write;
 
 import java.util.Optional;
 
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Component;
 
 import com.helospark.FakeSsh.cipher.SshCipher;
 

@@ -3,7 +3,7 @@ package com.helospark.FakeSsh.hostkey;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Component;
 
 /**
  * Creates ServerHostKeyAlgorithm based on it's name or throws exception.

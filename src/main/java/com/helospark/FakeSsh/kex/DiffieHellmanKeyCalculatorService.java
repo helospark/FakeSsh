@@ -3,7 +3,7 @@ package com.helospark.FakeSsh.kex;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Component;
 
 import com.helospark.FakeSsh.domain.DiffieHellmanKey;
 import com.helospark.FakeSsh.domain.GeneratedPrime;

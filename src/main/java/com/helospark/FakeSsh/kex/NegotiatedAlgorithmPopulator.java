@@ -3,8 +3,8 @@ package com.helospark.FakeSsh.kex;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Autowired;
+import com.helospark.lightdi.annotation.Component;
 
 import com.helospark.FakeSsh.SshConnection;
 import com.helospark.FakeSsh.cipher.SshCipher;

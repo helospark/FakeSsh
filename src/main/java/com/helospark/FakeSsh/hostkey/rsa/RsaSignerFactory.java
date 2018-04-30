@@ -6,7 +6,7 @@ import java.security.NoSuchProviderException;
 import java.security.Signature;
 import java.security.interfaces.RSAPrivateKey;
 
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Component;
 
 /**
  * Creates {@link DsaSigner} with DSA private key.

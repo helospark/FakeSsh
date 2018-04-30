@@ -1,6 +1,6 @@
 package com.helospark.FakeSsh;
 
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Component;
 
 @Component
 public class SshIgnoreMessageHandler implements SshCommonState {

@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.util.Optional;
 
 import org.bouncycastle.util.Arrays;
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Component;
 
 import com.helospark.FakeSsh.ApplicationConstants;
 import com.helospark.FakeSsh.ConnectionClosedException;

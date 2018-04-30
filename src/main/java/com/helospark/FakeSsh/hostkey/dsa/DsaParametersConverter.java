@@ -3,7 +3,7 @@ package com.helospark.FakeSsh.hostkey.dsa;
 import java.security.interfaces.DSAPrivateKey;
 
 import org.bouncycastle.crypto.params.DSAParameters;
-import org.springframework.stereotype.Component;
+import com.helospark.lightdi.annotation.Component;
 
 /**
  * Converts {@link DSAPrivateKey} to {@link DSAParameters}.
