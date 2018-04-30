@@ -30,78 +30,78 @@ import com.helospark.lightdi.annotation.Value;
 @Component
 @Order(0)
 public class RsaServerHostKeyAlgorithm implements ServerHostKeyAlgorithm {
-    private static final String RSA_NAME = "ssh-rsa";
-    private String privateKeyFileName;
-    private RsaSignatureService rsaSignerService;
-    private Base64PrivateKeyReader base64PrivateKeyReader;
-    private LoggerSupport loggerSupport;
+	private static final String RSA_NAME = "ssh-rsa";
+	private String privateKeyFileName;
+	private RsaSignatureService rsaSignerService;
+	private Base64PrivateKeyReader base64PrivateKeyReader;
+	private LoggerSupport loggerSupport;
 
-    private RSAPrivateKey rsaPrivateKey;
-    private SshString publicKey;
+	private RSAPrivateKey rsaPrivateKey;
+	private SshString publicKey;
 
-    @Autowired
-    public RsaServerHostKeyAlgorithm(@Value("${RSA_PRIVATE_KEY}") String privateKeyFileName, RsaSignerFactory rsaSignerFactory,
-            Base64PrivateKeyReader base64PrivateKeyReader, LoggerSupport loggerSupport, RsaSignatureService rsaSignerService) {
-        this.privateKeyFileName = privateKeyFileName;
-        this.rsaSignerService = rsaSignerService;
-        this.base64PrivateKeyReader = base64PrivateKeyReader;
-        this.loggerSupport = loggerSupport;
-    }
+	@Autowired
+	public RsaServerHostKeyAlgorithm(@Value("${RSA_PRIVATE_KEY}") String privateKeyFileName, RsaSignerFactory rsaSignerFactory,
+			Base64PrivateKeyReader base64PrivateKeyReader, LoggerSupport loggerSupport, RsaSignatureService rsaSignerService) {
+		this.privateKeyFileName = privateKeyFileName;
+		this.rsaSignerService = rsaSignerService;
+		this.base64PrivateKeyReader = base64PrivateKeyReader;
+		this.loggerSupport = loggerSupport;
+	}
 
-    @PostConstruct
-    public void afterPropertiesSet() throws Exception {
-        byte[] data = base64PrivateKeyReader.read(privateKeyFileName);
-        initializeFromData(data);
-        logRsaKeys(rsaPrivateKey, publicKey);
-    }
+	@PostConstruct
+	public void afterPropertiesSet() throws Exception {
+		byte[] data = base64PrivateKeyReader.read(privateKeyFileName);
+		initializeFromData(data);
+		logRsaKeys(rsaPrivateKey, publicKey);
+	}
 
-    private void logRsaKeys(RSAPrivateKey rsaPrivateKey, SshString publicKey) throws IOException {
-        loggerSupport.dumpBigIntegerInHex(rsaPrivateKey.getModulus(), "N");
-        loggerSupport.dumpBigIntegerInHex(rsaPrivateKey.getPrivateExponent(), "Private");
-        loggerSupport.dumpByteArrayInHex(publicKey.serialize(), "Public");
-    }
+	private void logRsaKeys(RSAPrivateKey rsaPrivateKey, SshString publicKey) throws IOException {
+		loggerSupport.dumpBigIntegerInHex(rsaPrivateKey.getModulus(), "N");
+		loggerSupport.dumpBigIntegerInHex(rsaPrivateKey.getPrivateExponent(), "Private");
+		loggerSupport.dumpByteArrayInHex(publicKey.serialize(), "Public");
+	}
 
-    private void initializeFromData(byte[] data) throws IOException {
-        ASN1InputStream input = new ASN1InputStream(data);
+	private void initializeFromData(byte[] data) throws IOException {
+		ASN1InputStream input = new ASN1InputStream(data);
 
-        ASN1Sequence asnSequence = createAsnInputStream(input);
+		ASN1Sequence asnSequence = createAsnInputStream(input);
 
-        BigInteger modulusN = ASN1Integer.getInstance(asnSequence.getObjectAt(1)).getPositiveValue();
-        BigInteger publicExponentE = ASN1Integer.getInstance(asnSequence.getObjectAt(2)).getPositiveValue();
-        BigInteger privateExponent = ASN1Integer.getInstance(asnSequence.getObjectAt(3)).getPositiveValue();
+		BigInteger modulusN = ASN1Integer.getInstance(asnSequence.getObjectAt(1)).getPositiveValue();
+		BigInteger publicExponentE = ASN1Integer.getInstance(asnSequence.getObjectAt(2)).getPositiveValue();
+		BigInteger privateExponent = ASN1Integer.getInstance(asnSequence.getObjectAt(3)).getPositiveValue();
 
-        rsaPrivateKey = new RsaPrivateKeyImpl(modulusN, privateExponent);
-        publicKey = initializePublicKey(publicExponentE, modulusN);
-        input.close();
-    }
+		rsaPrivateKey = new RsaPrivateKeyImpl(modulusN, privateExponent);
+		publicKey = initializePublicKey(publicExponentE, modulusN);
+		input.close();
+	}
 
-    private SshString initializePublicKey(BigInteger e, BigInteger n) throws IOException {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        outputStream.write(new SshString(RSA_NAME).serialize());
-        outputStream.write(new MpInt(e).serialize());
-        outputStream.write(new MpInt(n).serialize());
-        return new SshString(outputStream.toByteArray());
-    }
+	private SshString initializePublicKey(BigInteger e, BigInteger n) throws IOException {
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		outputStream.write(new SshString(RSA_NAME).serialize());
+		outputStream.write(new MpInt(e).serialize());
+		outputStream.write(new MpInt(n).serialize());
+		return new SshString(outputStream.toByteArray());
+	}
 
-    private ASN1Sequence createAsnInputStream(ASN1InputStream input) throws IOException {
-        ASN1Primitive primitive = input.readObject();
-        ASN1Sequence asnSequence = ASN1Sequence.getInstance(primitive);
-        return asnSequence;
-    }
+	private ASN1Sequence createAsnInputStream(ASN1InputStream input) throws IOException {
+		ASN1Primitive primitive = input.readObject();
+		ASN1Sequence asnSequence = ASN1Sequence.getInstance(primitive);
+		return asnSequence;
+	}
 
-    @Override
-    public SshString providePublicKey() {
-        return publicKey;
-    }
+	@Override
+	public SshString providePublicKey() {
+		return publicKey;
+	}
 
-    @Override
-    public byte[] sign(byte[] hash) throws Exception {
-        return rsaSignerService.sign(hash, rsaPrivateKey);
-    }
+	@Override
+	public byte[] sign(byte[] hash) throws Exception {
+		return rsaSignerService.sign(hash, rsaPrivateKey);
+	}
 
-    @Override
-    public String getSignatureName() {
-        return RSA_NAME;
-    }
+	@Override
+	public String getSignatureName() {
+		return RSA_NAME;
+	}
 
 }

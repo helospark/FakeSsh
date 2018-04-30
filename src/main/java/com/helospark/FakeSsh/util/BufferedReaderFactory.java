@@ -17,13 +17,13 @@ import com.helospark.lightdi.annotation.Component;
 @Component
 public class BufferedReaderFactory {
 
-    public BufferedReader createClasspathBufferedReader(String fileName) throws IOException {
-        InputStream inputStream = this.getClass().getClassLoader()
-                .getResourceAsStream(fileName);
-        return new BufferedReader(new InputStreamReader(inputStream));
-    }
+	public BufferedReader createClasspathBufferedReader(String fileName) throws IOException {
+		InputStream inputStream = this.getClass().getClassLoader()
+				.getResourceAsStream(fileName);
+		return new BufferedReader(new InputStreamReader(inputStream));
+	}
 
-    public BufferedReader createFromFile(File file) throws FileNotFoundException {
-        return new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-    }
+	public BufferedReader createFromFile(File file) throws FileNotFoundException {
+		return new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+	}
 }
